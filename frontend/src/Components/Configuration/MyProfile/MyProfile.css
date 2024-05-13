@@ -1,0 +1,129 @@
+.main-wrapper {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.main-container {
+  display: flex;
+  flex: 1; /* Ocupará el espacio restante después del NavBar */
+  padding: 20px;
+  align-items: flex-start; /* Esto asegura que los elementos estén alineados al inicio verticalmente */
+}
+
+.profile-container {
+  display: flex;
+  width: 100%; 
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden; /* Asegura que nada sobresalga del borde redondeado */
+}
+
+/* Estilo para los ítems del menú */
+.menu-item {
+  margin-bottom: 10px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 18px; /* Tamaño de fuente para los ítems del menú */
+  transition: background-color 0.3s; /* Efecto de transición para el fondo */
+}
+
+.menu-item.selected {
+  font-weight: bold;
+}
+
+/* Estilo para la sección de perfil */
+.profile-section {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* Estilos para centrar el título y hacer que ocupe toda la fila si es necesario */
+.profile-section h2 {
+  text-align: center;
+  width: 100%;
+  font-size: 35px;
+}
+
+.profile-section h3 {
+  width: 100%;
+  margin-bottom: 3%;
+}
+
+/* Estilo para el formulario */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-row {
+  display: flex; /* o 'grid' */
+  gap: 20px; /* Espacio entre los campos de formulario */
+  margin-bottom: 20px; /* Espacio después de cada fila */
+}
+
+.input-group {
+  flex: 1; /* Otra opción es dar un width específico */
+}
+
+
+/* Estilo para los grupos de entrada */
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 16px; /* Tamaño de fuente para las etiquetas */
+}
+
+/* Estilo para los campos de entrada */
+.input-field {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 20px; /* Espacio entre los campos de entrada */
+  border: 1px solid #ccc;
+  border-radius: 4px; /* Bordes redondeados para los campos de entrada */
+}
+
+/* Estilo para los botones */
+.update-button, .delete-button {
+  padding: 10px 20px; /* Ajusta el relleno según necesites */
+  border: none;
+  border-radius: 20px; /* Aumenta el radio del borde para hacerlo más redondeado */
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold; /* Hace que el texto sea en negrita */
+  margin-right: 10px; /* Espacio a la derecha del botón */
+  margin: 0 5px; /* Espacio entre botones */
+}
+
+.update-button {
+  background-color: black; /* Verde como en el prototipo */
+  color: white; /* Texto en blanco */
+  margin-right: 5%;
+}
+
+.delete-button {
+  background-color: #ffff; /* Rojo como en el prototipo */
+  color: #777E90; /* Texto en blanco */
+  position: relative; /* Posición relativa para posicionar el ícono 'X' */
+}
+
+/* Ícono 'X' para el botón borrar */
+.delete-button:before {
+  position: absolute;
+  content: '×';
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 25px; /* Tamaño del ícono 'X' */
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-start; /* Alinea los botones a la izquierda */
+  border-top: 1px solid #ccc; /* Añade una línea gris en la parte superior */
+  padding-top: 20px; /* Añade espacio por encima de los botones */
+  margin-top: 20px; /* Añade espacio por encima del borde */
+}

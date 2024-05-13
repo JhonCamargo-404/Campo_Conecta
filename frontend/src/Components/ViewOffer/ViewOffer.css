@@ -1,0 +1,90 @@
+.view-offer {
+    background: #ffffff;
+    height: 100vh;
+}
+
+.main-view {
+    height: 80vh;
+    width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-offer-image {
+    width: 45%;
+    height: 60%;  /* Reducido para no ocupar todo el alto */
+    background-size: contain; /* Cambiado de 'cover' a 'contain' para asegurar que se vea todo el contenido */
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 20px auto; /* Centrado y con un poco de margen */
+}
+
+.view-offer-details {
+    width: 100%; /* Utiliza el ancho completo para la sección detallada */
+    display: flex;
+    justify-content: space-evenly; /* Distribuye el contenido horizontalmente */
+    align-items: center;
+    border-top: 1px solid #c0c0c0; /* Línea divisoria gris */
+    padding: 20px 0; /* Espacio antes y después de la sección */
+}
+
+.info-offer {
+    width: 50%;
+    height: 50vh;
+    margin-right: 3vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    text-align: center;
+}
+
+.info-offer h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 7vh;
+}
+
+.info-offer p {
+    font-size: 1.5em;
+    color: #000000;
+    margin-bottom: 14vh;
+}
+
+.apply-button {
+    background-color: #000000;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    display: inline-block;
+    transition: background-color 0.3s;
+}
+
+.apply-button:hover {
+    background-color: #333333;
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+    .main-view {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .view-offer-image {
+        margin: 0;
+        width: 90%;
+        height: auto;
+        border-radius: 4vh;
+    }
+
+    .info-offer {
+        width: 90%;
+        margin: 3vh auto;
+    }
+}

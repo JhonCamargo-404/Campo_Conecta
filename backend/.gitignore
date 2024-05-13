@@ -1,0 +1,19 @@
+# Archivos de configuración específicos de entorno virtual
+/entornovirtual/
+
+# Archivos y carpetas generados por el entorno virtual (por ejemplo, venv, .venv)
+venv/
+.venv/
+
+# Archivos generados por IDEs o editores específicos
+.vscode/
+.idea/
+
+# Archivos de caché y registros
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pyzw

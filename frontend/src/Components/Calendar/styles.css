@@ -1,0 +1,17 @@
+.bt-default {
+    display: flex;
+    width: 30vh;
+    justify-content: space-between;
+    gap: 2px;
+    border-radius: 8px; /* Equivalente a rounded-lg en Tailwind */
+    border: 1px solid #adb5bd; /* Equivalente a border-metal-50 en Tailwind */
+    text-align: left;
+    font-size: 1rem; /* Equivalente a text-body-4 en Tailwind */
+    font-weight: normal; /* Equivalente a font-normal en Tailwind */
+  }
+  
+  .bt-default:hover{
+    transform: scale(1.05);
+    background-color: #002346;
+    color: white;
+  }

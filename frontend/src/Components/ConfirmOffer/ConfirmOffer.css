@@ -1,0 +1,98 @@
+/* Estilos base */
+.contariner-confirmOffer {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+.wrapper-confirmOffer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  height: 100vh;
+  width: 100vw;
+}
+
+.wrapper-confirmOffer .titulo {
+  width: 100vw;
+  margin-bottom: 3%;
+  font-weight: bold;
+  text-align: center;
+  font-size: 2em;
+  color: #000000;
+}
+
+.confirm-text {
+  display: flex;
+  width: 100vw;
+  height: 60vh;
+}
+
+.imagen-confirm-text {
+  width: 80vh;
+  height: 60vh;
+  background: url(../../Assets/granjero.png) no-repeat center center/cover;
+  background-size: contain;
+}
+
+.sub-confirm-text {
+  width: 100vw;
+  display: flex;
+  text-align: center;
+  align-items: center;
+}
+
+.sub-confirm-text h1 {
+  font-size: 2em;
+  color: #000000;
+}
+
+.return-home-button {
+  margin-top: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+}
+
+.return-home {
+  width: 40vw;
+  height: 45px;
+  background: #000000;
+  outline: none;
+  color: #ffffff;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.return-home:hover {
+  background: #264e70;
+  color: #ffffff;
+}
+
+/* Estilos para hacer la página responsive */
+@media only screen and (max-width: 768px) {
+  .wrapper-confirmOffer .titulo {
+    font-size: 1.5em; /* Reducir el tamaño del título */
+  }
+
+  .confirm-text {
+    flex-direction: column; /* Cambiar a diseño de columna */
+    align-items: center; /* Centrar elementos verticalmente */
+    height: auto; /* Altura automática */
+  }
+
+  .imagen-confirm-text {
+    width: 80%; /* Reducir el tamaño de la imagen */
+    height: auto; /* Altura automática */
+  }
+
+  .return-home {
+    width: 60%; /* Reducir el ancho del botón */
+  }
+}
