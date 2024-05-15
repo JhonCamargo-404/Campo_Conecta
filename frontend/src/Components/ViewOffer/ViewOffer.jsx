@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import "./ViewOffer.css";
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
-import BasicDateRangePicker from './BasicDateRangePicker'; // Asegúrate de que la ruta sea correcta
+import BasicDateRangePicker from './BasicDateRangePicker'; 
 import axios from 'axios';
-import dayjs from 'dayjs';
 
 const ViewOffer = () => {
     const { id } = useParams();
@@ -39,9 +38,6 @@ const ViewOffer = () => {
                 id_user: userId,
                 id_offer: id
             };
-
-            console.log('Sending data:', data);
-
             axios.post('http://localhost:8000/submit-dates', data)
                 .then(response => {
                     console.log('Dates sent successfully:', response.data);

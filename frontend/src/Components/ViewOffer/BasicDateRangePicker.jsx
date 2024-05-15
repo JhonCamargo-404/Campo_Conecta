@@ -10,7 +10,7 @@ export default function BasicDateRangePicker({ offerId, value, onChange }) {
   const [disabledDates, setDisabledDates] = React.useState([]);
 
   React.useEffect(() => {
-    axios.get(`http://localhost:8000/disabled_dates`)
+    axios.get(`http://localhost:8000/disabled_dates/${offerId}`)
       .then(response => {
         const dates = response.data.map(date => dayjs(date));
         setDisabledDates(dates);
@@ -28,6 +28,7 @@ export default function BasicDateRangePicker({ offerId, value, onChange }) {
           value={value}
           onChange={onChange}
           shouldDisableDate={(date) => {
+            console.log(disabledDates);
             return disabledDates.some(disabledDate => date.isSame(disabledDate, 'day'));
           }}
         />

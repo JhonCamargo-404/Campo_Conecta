@@ -151,7 +151,8 @@ class OfferCRUD:
                             encoded_filename = quote(filename)
                             image_url = f"http://localhost:8000/offer_images/{encoded_filename}"
                             image_urls.append(image_url)
-                    # Agrega la lista de URLs al primer resultado (asumiendo que los datos básicos de la oferta son iguales en todas las filas)
+                    # Agrega la lista de URLs al primer resultado (asumiendo que los datos básicos de la oferta son
+                    # iguales en todas las filas)
                     if image_urls:
                         results[0]['image_urls'] = image_urls
                     return results[0]
@@ -159,14 +160,15 @@ class OfferCRUD:
             print(f"An error occurred: {e}")
             return None
 
-    def get_disabled_dates(self):
+    def get_disabled_dates(self, id_offer):
         try:
             with self.connection.cursor() as cursor:
                 sql = """
                 SELECT startDate, finishDate
                 FROM applicant
+                WHERE id_offer = %s
                 """
-                cursor.execute(sql)
+                cursor.execute(sql, (id_offer,))
                 return cursor.fetchall()
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -191,13 +193,13 @@ class OfferCRUD:
         try:
             with self.connection.cursor() as cursor:
                 sql_associate = """
-                UPDATE offer
-                SET id_applicant = %s
-                WHERE id_offer = %s
+                UPDATE applicant
+                SET id_offer = %s
+                WHERE id_applicant = %s
                 """
-                cursor.execute(sql_associate, (id_applicant, id_offer))
+                cursor.execute(sql_associate, (id_offer, id_applicant))
                 self.connection.commit()
-                return cursor.rowcount > 0  # Devuelve True si se actualizó al menos una fila
+                return cursor.rowcount > 0
         except Exception as e:
             print("Error occurred while associating applicant with offer:", e)
             self.connection.rollback()

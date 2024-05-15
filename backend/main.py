@@ -3,7 +3,7 @@ import uuid
 from datetime import date, timedelta
 from typing import Optional, List
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form, Path
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
@@ -109,7 +109,6 @@ async def add_offer(labor_details: str = Form(...), offer_details: str = Form(..
 async def get_offers():
     try:
         offers = offer_crud.get_all_offers()
-        print("offers:", offers)  # Registro de depuración
         return JSONResponse(status_code=200, content=offers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -154,9 +153,9 @@ async def submit_dates(date_range: DateRange):
     return {"message": "Applicant created and associated with offer successfully"}
 
 
-@app.get("/disabled_dates", response_model=List[date])
-def get_disabled_dates():
-    applicants = offer_crud.get_disabled_dates()
+@app.get("/disabled_dates/{id_offer}", response_model=List[date])
+def get_disabled_dates(id_offer: int = Path(...)):
+    applicants = offer_crud.get_disabled_dates(id_offer)
     if not applicants:
         raise HTTPException(status_code=404, detail="No dates found")
 
