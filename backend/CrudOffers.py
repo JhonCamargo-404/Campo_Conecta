@@ -101,15 +101,10 @@ class OfferCRUD:
                 oi.coordinates,
                 hu.id_host_user, 
                 hu.id_user AS host_user_id,
-                a.id_applicant, 
-                a.id_user AS applicant_user_id, 
-                a.startDate, 
-                a.finishDate,
                 MIN(im.image_path) AS image_path  # Selecciona la primera imagen encontrada
             FROM offer o
             JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
             JOIN host_user hu ON o.id_host_user = hu.id_host_user
-            LEFT JOIN applicant a ON o.id_applicant = a.id_applicant
             LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
             GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
             """
@@ -163,6 +158,50 @@ class OfferCRUD:
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
+
+    def get_disabled_dates(self):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                SELECT startDate, finishDate
+                FROM applicant
+                """
+                cursor.execute(sql)
+                return cursor.fetchall()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return []
+
+    def add_applicant(self, id_user, start_date, finish_date):
+        try:
+            with self.connection.cursor() as cursor:
+                sql_applicant = """
+                INSERT INTO applicant (id_user, startDate, finishDate)
+                VALUES (%s, %s, %s)
+                """
+                cursor.execute(sql_applicant, (id_user, start_date, finish_date))
+                self.connection.commit()
+                return cursor.lastrowid  # Devuelve el ID del nuevo registro insertado
+        except Exception as e:
+            print("Error occurred while adding applicant:", e)
+            self.connection.rollback()
+            return None
+
+    def associate_applicant_with_offer(self, id_applicant, id_offer):
+        try:
+            with self.connection.cursor() as cursor:
+                sql_associate = """
+                UPDATE offer
+                SET id_applicant = %s
+                WHERE id_offer = %s
+                """
+                cursor.execute(sql_associate, (id_applicant, id_offer))
+                self.connection.commit()
+                return cursor.rowcount > 0  # Devuelve True si se actualizó al menos una fila
+        except Exception as e:
+            print("Error occurred while associating applicant with offer:", e)
+            self.connection.rollback()
+            return False
 
     def __del__(self):
         self.connection.close()

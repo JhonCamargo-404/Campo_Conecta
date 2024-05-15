@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional, List
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form
@@ -56,6 +56,13 @@ class OfferImage(BaseModel):
     image: UploadFile
 
 
+class DateRange(BaseModel):
+    startDate: date
+    endDate: date
+    id_user: int
+    id_offer: int
+
+
 # Endpoint para el registro de usuarios
 @app.post("/register/")
 async def register_user(user_data: UserRegistration):
@@ -102,6 +109,7 @@ async def add_offer(labor_details: str = Form(...), offer_details: str = Form(..
 async def get_offers():
     try:
         offers = offer_crud.get_all_offers()
+        print("offers:", offers)  # Registro de depuración
         return JSONResponse(status_code=200, content=offers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -131,3 +139,31 @@ async def add_offer_info(name_offer: str = Form(...),
         return {"message": "Offer info added successfully", "offer_id": offer_id}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@app.post("/submit-dates")
+async def submit_dates(date_range: DateRange):
+    id_applicant = offer_crud.add_applicant(date_range.id_user, date_range.startDate, date_range.endDate)
+    if not id_applicant:
+        raise HTTPException(status_code=400, detail="Failed to create applicant")
+
+    success = offer_crud.associate_applicant_with_offer(id_applicant, date_range.id_offer)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to associate applicant with offer")
+
+    return {"message": "Applicant created and associated with offer successfully"}
+
+
+@app.get("/disabled_dates", response_model=List[date])
+def get_disabled_dates():
+    applicants = offer_crud.get_disabled_dates()
+    if not applicants:
+        raise HTTPException(status_code=404, detail="No dates found")
+
+    disabled_dates = []
+    for applicant in applicants:
+        current_date = applicant['startDate']
+        while current_date <= applicant['finishDate']:
+            disabled_dates.append(current_date)
+            current_date += timedelta(days=1)
+    return disabled_dates
