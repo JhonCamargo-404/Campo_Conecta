@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import PdfViewer from './PdfViewer';
 
 const Applicants = ({ offerId, closeModal }) => {
   const [applicants, setApplicants] = useState([]);
+  const [selectedCv, setSelectedCv] = useState(null);
 
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -16,6 +18,18 @@ const Applicants = ({ offerId, closeModal }) => {
 
     fetchApplicants();
   }, [offerId]);
+
+  const handlePdfView = (cvUrl) => {
+    if (cvUrl) {
+      setSelectedCv(cvUrl);
+    } else {
+      alert('Este aplicante no tiene CV.');
+    }
+  };
+
+  const handleClosePdfViewer = () => {
+    setSelectedCv(null);
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -38,7 +52,7 @@ const Applicants = ({ offerId, closeModal }) => {
                 </div>
               </div>
               <div className="flex space-x-2">
-                <button className="p-2 bg-gray-200 rounded-full">
+                <button className="p-2 bg-gray-200 rounded-full" onClick={() => handlePdfView(applicant.cv)}>
                   <i className="fas fa-eye"></i>
                 </button>
                 <button className="p-2 bg-green-200 rounded-full">
@@ -53,6 +67,9 @@ const Applicants = ({ offerId, closeModal }) => {
         </div>
         <button onClick={closeModal} className="mt-4 px-4 py-2 bg-black text-white rounded-full">Volver</button>
       </div>
+      {selectedCv && (
+        <PdfViewer fileUrl={selectedCv} onClose={handleClosePdfViewer} />
+      )}
     </div>
   );
 };
