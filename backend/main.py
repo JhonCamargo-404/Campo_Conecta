@@ -11,7 +11,7 @@ from starlette.staticfiles import StaticFiles
 
 from Crud_User import UserCRUD
 from CrudOffers import OfferCRUD
-
+from Crud_User_Offer import CrudUserOffer
 app = FastAPI()
 
 app.mount("/offer_images", StaticFiles(directory="../backend/offer_images"), name="offer_images")
@@ -19,6 +19,7 @@ app.mount("/offer_images", StaticFiles(directory="../backend/offer_images"), nam
 # Conexión con la base de datos
 user_crud = UserCRUD('mysql://root:root@localhost:3306/campo_conectabd')
 offer_crud = OfferCRUD('mysql://root:root@localhost:3306/campo_conectabd')
+crud_user_offer = CrudUserOffer('mysql://root:root@localhost:3306/campo_conectabd')
 
 # Configuración de CORS para permitir solicitudes desde cualquier origen
 app.add_middleware(
@@ -176,5 +177,14 @@ async def delete_offer(id_offer: int):
         if not success:
             raise HTTPException(status_code=404, detail="Offer not found")
         return {"message": "Offer deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/get_applicants/{id_offer}")
+async def get_applicants(id_offer: int):
+    try:
+        applicants = crud_user_offer.get_applicants_for_offer(id_offer)
+        return JSONResponse(status_code=200, content=applicants)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
