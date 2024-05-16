@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 import "./ViewOffer.css";
 import NavBar from "../NavBar/NavBar";
@@ -7,6 +8,7 @@ import BasicDateRangePicker from './BasicDateRangePicker';
 import axios from 'axios';
 
 const ViewOffer = () => {
+    const navigate = useNavigate();
     const { id } = useParams();
     const [offer, setOffer] = useState(null);
     const userId = 1; // Asume que tienes el userId de alguna manera, por ejemplo, desde el estado o el contexto.
@@ -39,7 +41,7 @@ const ViewOffer = () => {
             };
             axios.post('http://localhost:8000/submit-dates', data)
                 .then(response => {
-                    console.log('Dates sent successfully:', response.data);
+                    navigate('/ApplicationConfirmed');
                     setError(''); // Clear error on success
                 })
                 .catch(error => {

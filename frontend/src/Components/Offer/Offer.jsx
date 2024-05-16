@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { UploadComponent } from './UploadComponent';
 import NavBar from "../NavBar/NavBar";
 import axios from 'axios';
@@ -9,7 +10,7 @@ import TextareaField from './TextareaField';
 
 
 const Offer = () => {
-
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name_offer: '',
     start_day: '',
@@ -89,6 +90,7 @@ const Offer = () => {
         }
       });
       console.log('Success:', response);
+      navigate('/ConfirmOffer');
     } catch (error) {
       console.error('Error:', error);
     }
