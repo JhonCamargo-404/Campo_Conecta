@@ -82,11 +82,6 @@ const Offer = () => {
     return;
   }
 
-    // Imprimir el contenido de FormData antes de enviarlo
-    for (let pair of data.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    }
-
     try {
       const response = await axios.post('http://localhost:8000/add_offer/', data, {
         headers: {
@@ -167,7 +162,7 @@ const Offer = () => {
   
               <SelectField
                 label="¿Ofrece alimentación?"
-                name="food"
+                name="feeding"
                 options={["Si", "No"]}
                 value={formData.feeding}
                 onChange={handleChange}

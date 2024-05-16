@@ -17,7 +17,6 @@ const ViewOffer = () => {
         const fetchOfferDetails = async () => {
             const response = await fetch(`http://127.0.0.1:8000/get_offer/${id}`);
             const data = await response.json();
-            console.log(data);
             setOffer(data);
         };
 

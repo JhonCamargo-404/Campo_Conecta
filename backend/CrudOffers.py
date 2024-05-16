@@ -128,34 +128,49 @@ class OfferCRUD:
             with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 sql = """
                 SELECT 
-                    o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates,
-                    hu.id_host_user, a.id_applicant, im.image_path,
-                    lc.salary, lc.feeding
+                    o.id_offer, 
+                    oi.name_offer, 
+                    oi.start_day, 
+                    oi.description, 
+                    oi.coordinates,
+                    hu.id_host_user, 
+                    lc.salary, 
+                    lc.feeding,
+                    oi.id_offer_info,
+                    GROUP_CONCAT(DISTINCT a.id_applicant) AS applicants
                 FROM offer o
                 JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
                 JOIN host_user hu ON o.id_host_user = hu.id_host_user
-                LEFT JOIN applicant a ON o.id_applicant = a.id_applicant
-                LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
+                LEFT JOIN applicant a ON o.id_offer = a.id_offer
                 JOIN labor_conditions lc ON o.id_labor_condition = lc.id_labor_condition
                 WHERE o.id_offer = %s
+                GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user, lc.salary, lc.feeding, oi.id_offer_info
                 """
                 cursor.execute(sql, (offer_id,))
-                results = cursor.fetchall()
-                if results:
+                result = cursor.fetchone()
+                if result:
+                    # Obtener todas las imágenes asociadas con la oferta
+                    cursor.execute("SELECT image_path FROM image_offer WHERE id_offer_info = %s",
+                                   (result['id_offer_info'],))
+                    images = cursor.fetchall()
+
                     # Inicializa una lista vacía para almacenar URLs de imágenes
                     image_urls = []
-                    # Itera sobre cada fila en los resultados
-                    for result in results:
-                        if result['image_path']:
-                            filename = result['image_path'].split('/')[-1]
+                    for image in images:
+                        if image['image_path']:
+                            filename = image['image_path'].split('/')[-1]
                             encoded_filename = quote(filename)
                             image_url = f"http://localhost:8000/offer_images/{encoded_filename}"
                             image_urls.append(image_url)
-                    # Agrega la lista de URLs al primer resultado (asumiendo que los datos básicos de la oferta son
-                    # iguales en todas las filas)
-                    if image_urls:
-                        results[0]['image_urls'] = image_urls
-                    return results[0]
+
+                    # Agrega la lista de URLs a los resultados
+                    result['image_urls'] = image_urls
+
+                    # Convierte la cadena concatenada de applicants en una lista de enteros
+                    result['applicants'] = [int(a) for a in result['applicants'].split(',')] if result[
+                        'applicants'] else []
+
+                    return result
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
@@ -202,6 +217,18 @@ class OfferCRUD:
                 return cursor.rowcount > 0
         except Exception as e:
             print("Error occurred while associating applicant with offer:", e)
+            self.connection.rollback()
+            return False
+
+    def delete_offer(self, id_offer):
+        try:
+            with self.connection.cursor() as cursor:
+                sql_delete = "DELETE FROM offer WHERE id_offer = %s"
+                cursor.execute(sql_delete, (id_offer,))
+                self.connection.commit()
+                return cursor.rowcount > 0
+        except Exception as e:
+            print("Error occurred while deleting offer:", e)
             self.connection.rollback()
             return False
 

@@ -25,7 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -85,6 +85,7 @@ async def add_offer(labor_details: str = Form(...), offer_details: str = Form(..
         labor_details_model = LaborDetails(**json.loads(labor_details))
         offer_details_model = OfferDetails(**json.loads(offer_details))
 
+        print(labor_details_model)
         # Guardar la imagen en el sistema de archivos
         image_paths = []
         for image in images:
@@ -166,3 +167,14 @@ def get_disabled_dates(id_offer: int = Path(...)):
             disabled_dates.append(current_date)
             current_date += timedelta(days=1)
     return disabled_dates
+
+
+@app.delete("/delete_offer/{id_offer}")
+async def delete_offer(id_offer: int):
+    try:
+        success = offer_crud.delete_offer(id_offer)
+        if not success:
+            raise HTTPException(status_code=404, detail="Offer not found")
+        return {"message": "Offer deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
