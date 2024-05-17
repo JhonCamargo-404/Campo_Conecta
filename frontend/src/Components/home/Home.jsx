@@ -4,7 +4,7 @@ import Footer from "../Footer/Footer";
 import { MdOutlineMyLocation } from "react-icons/md";
 import { BsFillFilterSquareFill } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import Map from "../Map/Map"
+import Map from "../Map/Map";
 
 const OfferCard = ({ id, title, description, start_day, image_url }) => {
   return (
@@ -40,13 +40,14 @@ const OffersHeader = () => {
   );
 };
 
-
 const OffersContainer = () => {
   const [offers, setOffers] = useState([]);
+
   useEffect(() => {
     const fetchOffers = async () => {
       try {
         const response = await fetch("http://127.0.0.1:8000/get_offers");
+
         const data = await response.json();
         setOffers(data);
       } catch (error) {
@@ -56,6 +57,7 @@ const OffersContainer = () => {
 
     fetchOffers();
   }, []);
+
   return (
     <div className="flex flex-col justify-center gap-5 p-4 w-4/5 mx-auto">
       {offers.map((offer) => (
@@ -65,14 +67,13 @@ const OffersContainer = () => {
           title={offer.name_offer}
           description={offer.description}
           start_day={offer.start_day}
-          image_url={offer.image_url} 
+          image_url={offer.image_url}
         />
       ))}
       <button className="bg-white border border-black py-2 px-5 rounded-full cursor-pointer text-lg my-4 mx-auto">Cargar más</button>
     </div>
   );
 };
-
 
 const Home = () => {
   return (
@@ -85,6 +86,6 @@ const Home = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default Home;
