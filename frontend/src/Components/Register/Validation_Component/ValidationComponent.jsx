@@ -24,12 +24,19 @@ const ValidationComponent = ({ message, onClose }) => {
         {message.includes("Error") ? (
           <div className="error-image" />
         ) : (
-          <div className="success-image" />
+          <>
+            <div className="success-image" />
+            <button className="login-btn" onClick={handleLogin}>Iniciar Sesión</button>
+          </>
         )}
       </div>
       <span className="close-btn" onClick={onClose}>Cerrar</span>
     </div>
   );
+};
+
+const handleLogin = () => {
+  window.location.href = "../../Login";
 };
 
 export default ValidationComponent;

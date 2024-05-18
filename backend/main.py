@@ -46,6 +46,7 @@ class UserRegistration(BaseModel):
     last_name: str
     email: str
     password: str
+    age: int
 
 
 class UserLogin(BaseModel):
@@ -92,14 +93,13 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 @app.post("/register/")
 async def register_user(user_data: UserRegistration):
     try:
-        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email, user_data.password)
+        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email, user_data.password, user_data.age)
         if response["success"]:
             return {"message": response["message"]}
         else:
             raise HTTPException(status_code=400, detail=response["message"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Endpoint para el login de usuarios
 @app.post("/login/")

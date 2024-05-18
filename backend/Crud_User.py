@@ -15,15 +15,18 @@ class UserCRUD:
             cursorclass=pymysql.cursors.DictCursor
         )
 
-    def register_user(self, user_name, user_last_name, email, password):
+    def register_user(self, user_name, user_last_name, email, password, age):
         if self.check_email_exists(email):
             return {"success": False, "message": "El correo electrónico ya está registrado"}
+
+        if int(age) < 18:
+            return {"success": False, "message": "Debes ser mayor de 18 años"}
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         with self.connection.cursor() as cursor:
-            sql = "INSERT INTO Info_User (user_name, user_last_name) VALUES (%s, %s)"
-            cursor.execute(sql, (user_name, user_last_name))
+            sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (user_name, user_last_name, age))
             user_id = cursor.lastrowid
             sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
             cursor.execute(sql, (hashed_password, email, 'U'))
