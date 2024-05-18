@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./Login.css";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,6 +25,8 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.access_token);
+        const decoded = jwtDecode(data.access_token);
+        setUser(decoded);
         navigate("/home", { state: { isLoggedIn: true } });
       } else {
         const data = await response.json();
@@ -50,7 +55,7 @@ const Login = () => {
           <div className="input-box">
             <input
               type="password"
-              placeholder="Constraseña"
+              placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -60,15 +65,15 @@ const Login = () => {
           <div className="remember-forgot">
             <label>
               <input type="checkbox" />
-              Recordar datos{" "}
+              Recordar datos
             </label>
-            <a href="#"> ¿Olvidaste la contraseña?</a>
+            <Link to="/ForgotPassword">¿Olvidaste la contraseña?</Link>
           </div>
           <button type="submit">Entrar</button>
           <div className="register-link">
             <p>
               ¿No tienes una cuenta?
-              <a href="../Register"> ¡Registrate!</a>
+              <Link to="/Register">¡Regístrate!</Link>
             </p>
           </div>
         </form>
