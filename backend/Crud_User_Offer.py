@@ -34,6 +34,10 @@ class CrudUserOffer:
                 """
                 cursor.execute(sql, (id_offer,))
                 results = cursor.fetchall()
+                for result in results:
+                    if result['cv']:
+                        result['cv'] = f"http://localhost:8000/cv_storage/{result['cv'].split('/')[-1]}"
                 return results
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+

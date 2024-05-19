@@ -232,5 +232,34 @@ class OfferCRUD:
             self.connection.rollback()
             return False
 
+    # En OfferCRUD
+
+    def check_application(self, id_user, id_offer):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "SELECT id_applicant FROM applicant WHERE id_user=%s AND id_offer=%s"
+                cursor.execute(sql, (id_user, id_offer))
+                result = cursor.fetchone()
+                return bool(result)  # Retorna True si encuentra un resultado, False de lo contrario
+        except Exception as e:
+            print(f"Error checking application: {e}")
+            return False  # O maneja más adecuadamente según tus necesidades
+
+    def add_application(self, id_user, id_offer, start_date, finish_date):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                INSERT INTO applicant (id_user, id_offer, startDate, finishDate)
+                VALUES (%s, %s, %s, %s)
+                """
+                cursor.execute(sql, (id_user, id_offer, start_date, finish_date))
+                self.connection.commit()
+                return True  # Asume éxito si no hay excepciones
+        except Exception as e:
+            print(f"Error adding application: {e}")
+            self.connection.rollback()
+            return False
+
+
     def __del__(self):
         self.connection.close()

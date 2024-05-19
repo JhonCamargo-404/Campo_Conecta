@@ -73,6 +73,33 @@
     background-color: #333;
 }
 
+.ReactModal__Content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+    width: 90%;
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    z-index: 1001; /* Asegura que el contenido está sobre el overlay */
+}
+
+.upload-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.upload-button, .close-button {
+    margin-right: 10px;
+}
+
+.body-blur {
+    filter: blur(5px);
+}
+
 /* Responsive */
 @media only screen and (max-width: 768px) {
     .main-view {

@@ -12,9 +12,11 @@ from starlette.staticfiles import StaticFiles
 from Crud_User import UserCRUD
 from CrudOffers import OfferCRUD
 from Crud_User_Offer import CrudUserOffer
+
 app = FastAPI()
 
 app.mount("/offer_images", StaticFiles(directory="../backend/offer_images"), name="offer_images")
+app.mount("/cv_storage", StaticFiles(directory="../backend/cv_storage"), name="cv_storage")
 
 # Conexión con la base de datos
 user_crud = UserCRUD('mysql://root:root@localhost:3306/campo_conectabd')
@@ -113,6 +115,7 @@ async def get_offers():
         offers = offer_crud.get_all_offers()
         return JSONResponse(status_code=200, content=offers)
     except Exception as e:
+        logging.error(f"Failed to fetch offers: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -188,3 +191,34 @@ async def get_applicants(id_offer: int):
         return JSONResponse(status_code=200, content=applicants)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Verificar si el usuario ya ha aplicado a una oferta
+@app.get("/has_applied/{id_user}/{id_offer}")
+async def has_applied(id_user: int, id_offer: int):
+    application_exists = offer_crud.check_application(id_user, id_offer)
+    return {"has_applied": application_exists}
+
+
+# Obtener el CV de un usuario
+@app.get("/get_cv/{user_id}")
+async def get_cv(user_id: int):
+    cv_path = user_crud.get_cv(user_id)
+    if cv_path:
+        return {"cv": cv_path}
+    else:
+        raise HTTPException(status_code=404, detail="CV not found")
+
+
+# Cargar el CV de un usuario
+@app.post("/upload_cv/{user_id}")
+async def upload_cv(user_id: int, file: UploadFile = File(...)):
+    filename = f"{uuid.uuid4()}_{file.filename}"
+    path = f"../backend/cv_storage/{filename}"
+    with open(path, 'wb') as buffer:
+        buffer.write(await file.read())
+    success = user_crud.update_cv_path(user_id, path)
+    if success:
+        return {"message": "CV uploaded successfully", "path": path}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to upload CV")

@@ -19,9 +19,10 @@ const Applicants = ({ offerId, closeModal }) => {
     fetchApplicants();
   }, [offerId]);
 
-  const handlePdfView = (cvUrl) => {
-    if (cvUrl) {
-      setSelectedCv(cvUrl);
+  const handlePdfView = (cv) => {
+    console.log("Attempting to view PDF at URL:", cv);
+    if (cv) {
+      setSelectedCv(cv);
     } else {
       alert('Este aplicante no tiene CV.');
     }

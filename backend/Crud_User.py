@@ -64,5 +64,32 @@ class UserCRUD:
         self.connection.commit()
         print("Contraseña actualizada con éxito.")
 
+    def get_cv(self, user_id):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "SELECT cv FROM info_User WHERE id_info_user=%s"
+                cursor.execute(sql, (user_id,))
+                result = cursor.fetchone()
+                if result and result['cv']:
+                    # Asume que los CVs están almacenados en una carpeta accesible desde el servidor
+                    filename = result['cv'].split('/')[-1]  # Asume que el path almacena el nombre del archivo
+                    return f"http://localhost:8000/cv_storage/{filename}"  # Ajusta la ruta según la configuración de tu servidor
+                return None
+        except Exception as e:
+            print(f"Error getting CV path: {e}")
+            return None
+
+    def update_cv_path(self, user_id, cv_path):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "UPDATE info_User SET cv=%s WHERE id_info_user=%s"
+                cursor.execute(sql, (cv_path, user_id))
+                self.connection.commit()
+                return True
+        except Exception as e:
+            print(f"Error updating CV path: {e}")
+            self.connection.rollback()
+            return False
+
     def __del__(self):
         self.connection.close()
