@@ -11,7 +11,8 @@ const Register = () => {
     last_name: "",
     email: "",
     password: "",
-    repeat_password: ""
+    repeat_password: "",
+    age: ""
   });
 
   const [errors, setErrors] = useState({
@@ -19,7 +20,8 @@ const Register = () => {
     last_name: "",
     email: "",
     password: "",
-    repeat_password: ""
+    repeat_password: "",
+    age: ""
   });
 
   const [message, setMessage] = useState("");
@@ -28,15 +30,23 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    
-    if (name === "email") {
-      const isValidEmail = /\S+@\S+\.\S+/.test(value);
-      setErrors({ ...errors, email: isValidEmail ? "" : "Correo electrónico no válido" });
-    } else if (name === "repeat_password") {
-      setErrors({ ...errors, repeat_password: value === formData.password ? "" : "Las contraseñas no coinciden" });
+    if (name === "age") {
+      const ageValue = value.replace(/\D/g, "");
+      setFormData({ ...formData, age: ageValue });
+      setErrors({
+        ...errors,
+        age: ageValue && (parseInt(ageValue) < 18) ? "Debes ser mayor de 18 años" : ""
+      });
     } else {
-      setErrors({ ...errors, [name]: "" });
+      setFormData({ ...formData, [name]: value });
+      if (name === "email") {
+        const isValidEmail = /\S+@\S+\.\S+/.test(value);
+        setErrors({ ...errors, email: isValidEmail ? "" : "Correo electrónico no válido" });
+      } else if (name === "repeat_password") {
+        setErrors({ ...errors, repeat_password: value === formData.password ? "" : "Las contraseñas no coinciden" });
+      } else {
+        setErrors({ ...errors, [name]: "" });
+      }
     }
   };
 
@@ -52,7 +62,8 @@ const Register = () => {
           last_name: "",
           email: "",
           password: "",
-          repeat_password: ""
+          repeat_password: "",
+          age: ""
         });
       } catch (error) {
         if (error.response && error.response.data.detail) {
@@ -69,7 +80,7 @@ const Register = () => {
   };
 
   const isFormValid = () => {
-    return Object.values(errors).every(error => error === "");
+    return Object.values(errors).every(error => error === "") && formData.age !== "";
   };
 
   const closeValidation = () => {
@@ -126,6 +137,10 @@ const Register = () => {
                 )}
               </span>
               {errors.repeat_password && <p className="error-message">{errors.repeat_password}</p>}
+            </div>
+            <div className="input-box">
+              <input type="text" name="age" placeholder="Edad" value={formData.age} onChange={handleChange} required />
+              {errors.age && <p className="error-message">{errors.age}</p>}
             </div>
             <button type="submit">
               <p>Registrarse</p>

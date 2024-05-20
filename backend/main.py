@@ -1,14 +1,16 @@
 import json
 import uuid
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from typing import Optional, List
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form, Path
+from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form, Path, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
 
+import jwt
 from Crud_User import UserCRUD
 from CrudOffers import OfferCRUD
 from Crud_User_Offer import CrudUserOffer
@@ -17,6 +19,12 @@ app = FastAPI()
 
 app.mount("/offer_images", StaticFiles(directory="../backend/offer_images"), name="offer_images")
 app.mount("/cv_storage", StaticFiles(directory="../backend/cv_storage"), name="cv_storage")
+
+# Secret key for JWT
+SECRET_KEY = "your_secret_key"
+
+# Path for token authentication
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Conexión con la base de datos
 user_crud = UserCRUD('mysql://root:root@localhost:3306/campo_conectabd')
@@ -33,10 +41,16 @@ app.add_middleware(
 )
 
 
-# Modelo de datos para la creación de usuarios
+# Modelos de datos para la creación de usuarios y otros
 class UserRegistration(BaseModel):
     first_name: str
     last_name: str
+    email: str
+    password: str
+    age: int
+
+
+class UserLogin(BaseModel):
     email: str
     password: str
 
@@ -66,18 +80,45 @@ class DateRange(BaseModel):
     id_offer: int
 
 
+def verify_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
 # Endpoint para el registro de usuarios
 @app.post("/register/")
 async def register_user(user_data: UserRegistration):
     try:
-        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email,
-                                           user_data.password)
+        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email, user_data.password, user_data.age)
         if response["success"]:
             return {"message": response["message"]}
         else:
             raise HTTPException(status_code=400, detail=response["message"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Endpoint para el login de usuarios
+@app.post("/login/")
+async def login_user(user_data: UserLogin):
+    try:
+        token = user_crud.login(user_data.email, user_data.password)
+        if token:
+            return {"access_token": token, "token_type": "bearer"}
+        else:
+            raise HTTPException(status_code=400, detail="Invalid email or password")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# Endpoint protegido de ejemplo
+@app.get("/protected-route/")
+async def protected_route(user: dict = Depends(verify_token)):
+    return {"message": "You are authorized", "user": user}
 
 
 @app.post("/add_offer/")

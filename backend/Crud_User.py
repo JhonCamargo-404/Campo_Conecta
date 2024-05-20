@@ -1,26 +1,32 @@
 import pymysql.cursors
 import bcrypt
+import jwt
+from datetime import datetime, timedelta
 
+SECRET_KEY = 'your_secret_key'
 
 class UserCRUD:
     def __init__(self, db_url):
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='bryan',
+            password='root',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
 
-    def register_user(self, user_name, user_last_name, email, password):
+    def register_user(self, user_name, user_last_name, email, password, age):
         if self.check_email_exists(email):
             return {"success": False, "message": "El correo electrónico ya está registrado"}
+
+        if int(age) < 18:
+            return {"success": False, "message": "Debes ser mayor de 18 años"}
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         with self.connection.cursor() as cursor:
-            sql = "INSERT INTO Info_User (user_name, user_last_name) VALUES (%s, %s)"
-            cursor.execute(sql, (user_name, user_last_name))
+            sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
+            cursor.execute(sql, (user_name, user_last_name, age))
             user_id = cursor.lastrowid
             sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
             cursor.execute(sql, (hashed_password, email, 'U'))
@@ -42,12 +48,21 @@ class UserCRUD:
             result = cursor.fetchone()
             if result:
                 hashed_password = result['user_password']
-                # Convertir el hash almacenado en UTF-8
                 hashed_password_utf8 = hashed_password.encode('utf-8')
-                # Verificar la contraseña
-                return bcrypt.checkpw(password.encode('utf-8'), hashed_password_utf8)
+                if bcrypt.checkpw(password.encode('utf-8'), hashed_password_utf8):
+                    return self.create_jwt(email)
+                else:
+                    return None
             else:
-                return False
+                return None
+
+    def create_jwt(self, email):
+        payload = {
+            "email": email,
+            "exp": datetime.utcnow() + timedelta(hours=1)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        return token
 
     def update_password(self, email, current_password, new_password):
         if not self.login(email, current_password):
@@ -57,7 +72,6 @@ class UserCRUD:
         hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
 
         with self.connection.cursor() as cursor:
-            # Actualizar la contraseña en la tabla User_Credentials
             sql = "UPDATE User_Credentials SET user_password = %s WHERE email = %s"
             cursor.execute(sql, (hashed_new_password, email))
 
