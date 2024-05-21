@@ -3,7 +3,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import React, { useContext } from 'react';
 import Login from './Components/Login/Login';
 import Register from './Components/Register/Register';
-import Home from './Components/Home/Home';
+import Home from './Components/home/Home';
 import UserProfile from './Components/Configuration/MyProfile/MyProfile';
 import MyOffers from './Components/Configuration/MyOffers/MyOffers';
 import MyAdvertisements from './Components/Configuration/Advertisement/MyAdvertisements';
