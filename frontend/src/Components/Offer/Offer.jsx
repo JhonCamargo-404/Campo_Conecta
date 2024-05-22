@@ -20,7 +20,6 @@ const Offer = () => {
     feeding: '',
     workingHours: 0,
     workingDay: '',
-    host_user_id: 1,
     images: []
   });
 
@@ -45,7 +44,7 @@ const Offer = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-  
+
     if (name === "images") {
       setFormData(prevState => ({ ...prevState, [name]: [...files] }));
     } else if (name === "shift") {
@@ -55,9 +54,18 @@ const Offer = () => {
       setFormData(prevState => ({ ...prevState, [name]: value }));
     }
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
     const data = new FormData();
     data.append('labor_details', JSON.stringify({
       salary: formData.salary,
@@ -71,28 +79,43 @@ const Offer = () => {
       description: formData.description,
       coordinates: formData.coordinates
     }));
-    data.append('host_user_id', formData.host_user_id);
 
-  if (formData.images && formData.images.length > 0) {
-    // Añadir cada archivo de imagen individualmente
-    for (let i = 0; i < formData.images.length; i++) {
-      data.append(`images`, formData.images[i]); // Usa el mismo nombre de campo para cada archivo
+    if (formData.images && formData.images.length > 0) {
+      // Añadir cada archivo de imagen individualmente
+      for (let i = 0; i < formData.images.length; i++) {
+        data.append(`images`, formData.images[i]); // Usa el mismo nombre de campo para cada archivo
+      }
+    } else {
+      console.error('No image file selected');
+      return;
     }
-  } else {
-    console.error('No image file selected');
-    return;
-  }
-
+    // Imprime la información del formulario antes de enviarla
+    console.log('Form Data:', Object.fromEntries(data.entries()));
+    
     try {
-      const response = await axios.post('http://localhost:8000/add_offer/', data, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axios.post('http://localhost:8000/add_offer/', data, config);
       console.log('Success:', response);
       navigate('/ConfirmOffer');
     } catch (error) {
-      console.error('Error:', error);
+      if (error.response) {
+        // El servidor respondió con un estado fuera del rango 2xx
+        console.error('Server responded with error:', error.response.status, error.response.data);
+        if (error.response.status === 401) {
+          // Manejo específico para errores de autenticación
+          alert('Su sesión ha expirado, por favor inicie sesión de nuevo.');
+          // Redirigir al usuario al login o manejar la renovación del token
+        } else if (error.response.status === 500) {
+          alert('Error interno del servidor, por favor intente de nuevo más tarde.');
+        }
+      } else if (error.request) {
+        // La solicitud fue hecha pero no se recibió respuesta
+        console.error('No response received:', error.request);
+        alert('Error de conexión, por favor verifique su conexión a internet.');
+      } else {
+        // Algo más causó el error
+        console.error('Error:', error.message);
+        alert('Ocurrió un error inesperado.');
+      }
     }
   }
 
@@ -103,11 +126,11 @@ const Offer = () => {
         <div className="offer-wrapper">
           <form onSubmit={handleSubmit}>
             <h1>Formulario de Creación de Ofertas</h1>
-  
+
             <div className="input-box-image">
               <UploadComponent onFilesSelected={(files) => setFormData(prev => ({ ...prev, images: files }))} />
             </div>
-  
+
             <div className="todo">
               <InputField
                 label="Título"
@@ -117,7 +140,7 @@ const Offer = () => {
                 value={formData.name_offer}
                 onChange={handleChange}
               />
-  
+
               <LocationField
                 label="Ubicación"
                 name="coordinates"
@@ -126,7 +149,7 @@ const Offer = () => {
                 onChange={handleChange}
                 onClick={handleLocationClick}
               />
-  
+
               <InputField
                 label="Horas de trabajo"
                 type="number"
@@ -135,7 +158,7 @@ const Offer = () => {
                 value={formData.workingHours}
                 onChange={handleChange}
               />
-  
+
               <InputField
                 label="Salario"
                 type="number"
@@ -144,7 +167,7 @@ const Offer = () => {
                 value={formData.salary}
                 onChange={handleChange}
               />
-  
+
               <InputField
                 label="Fecha de inicio"
                 type="date"
@@ -153,7 +176,7 @@ const Offer = () => {
                 value={formData.start_day}
                 onChange={handleChange}
               />
-  
+
               <SelectField
                 label="¿Ofrece alojamiento?"
                 name="accommodation"
@@ -161,7 +184,7 @@ const Offer = () => {
                 value={formData.accommodation}
                 onChange={handleChange}
               />
-  
+
               <SelectField
                 label="¿Ofrece alimentación?"
                 name="feeding"
@@ -169,7 +192,7 @@ const Offer = () => {
                 value={formData.feeding}
                 onChange={handleChange}
               />
-  
+
               <SelectField
                 label="Jornada"
                 name="shift"
@@ -177,7 +200,7 @@ const Offer = () => {
                 value={formData.workingDay === 'D' ? 'Completa' : 'Media'}
                 onChange={handleChange}
               />
-  
+
               <TextareaField
                 label="Descripción"
                 name="description"
@@ -185,7 +208,7 @@ const Offer = () => {
                 value={formData.description}
                 onChange={handleChange}
               />
-  
+
             </div>
             <div className="button-container">
               <button type="submit" className="create-offer-button">Crear oferta</button>

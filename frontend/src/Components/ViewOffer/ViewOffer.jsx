@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import axios from 'axios';
-
+import { jwtDecode } from 'jwt-decode';  
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';
@@ -15,7 +15,8 @@ const ViewOffer = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [offer, setOffer] = useState(null);
-    const userId = 2;  // Asume que tienes el userId de alguna manera, por ejemplo, desde el estado o el contexto.
+    const token = localStorage.getItem('token');
+    const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
     const [dateRange, setDateRange] = useState([null, null]);
     const [error, setError] = useState('');
     const [hasApplied, setHasApplied] = useState(false);
@@ -24,6 +25,10 @@ const ViewOffer = () => {
     const [files, setFiles] = useState([]);  // Estado para manejar los archivos
 
     useEffect(() => {
+        if (!userId) {
+            navigate('/login'); // Redirigir al login si no hay userId
+        }
+
         const fetchOfferDetails = async () => {
             const response = await axios.get(`http://127.0.0.1:8000/get_offer/${id}`);
             const data = response.data;
@@ -45,8 +50,7 @@ const ViewOffer = () => {
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
-                    // Tratar la ausencia de CV no como un error sino como un estado esperado
-                    setIsUploadModalOpen(true);  // Abre el modal para que el usuario pueda subir un CV
+                    setIsUploadModalOpen(true); 
                 } else {
                     console.error('Error fetching CV:', error);
                     setError('An unexpected error occurred while fetching your CV.');
@@ -58,7 +62,7 @@ const ViewOffer = () => {
         fetchOfferDetails();
         fetchAppliedStatus();
         fetchCv();
-    }, [id, userId]);
+    }, [id, userId, navigate]);
 
     const handleDateChange = (newValue) => {
         setDateRange(newValue);

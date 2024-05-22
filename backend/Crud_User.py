@@ -10,7 +10,7 @@ class UserCRUD:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bryan',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -24,15 +24,27 @@ class UserCRUD:
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        with self.connection.cursor() as cursor:
-            sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (user_name, user_last_name, age))
-            user_id = cursor.lastrowid
-            sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
-            cursor.execute(sql, (hashed_password, email, 'U'))
+        try:
+            with self.connection.cursor() as cursor:
+                # Insertar en Info_User
+                sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (user_name, user_last_name, age))
+                info_user_id = cursor.lastrowid  # ID generado para Info_User
 
-        self.connection.commit()
-        return {"success": True, "message": "Usuario registrado con éxito"}
+                # Insertar en User_Credentials
+                sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
+                cursor.execute(sql, (hashed_password, email, 'U'))
+                user_credentials_id = cursor.lastrowid  # ID generado para User_Credentials
+
+                # Insertar en users
+                sql = "INSERT INTO users (id_user_credentials, id_info_user) VALUES (%s, %s)"
+                cursor.execute(sql, (user_credentials_id, info_user_id))
+
+            self.connection.commit()  # Confirmar todos los cambios si todo es correcto
+            return {"success": True, "message": "Usuario registrado con éxito"}
+        except Exception as e:
+            self.connection.rollback()  # Revertir cambios si hay un error
+            return {"success": False, "message": str(e)}
 
     def check_email_exists(self, email):
         with self.connection.cursor() as cursor:
@@ -43,22 +55,30 @@ class UserCRUD:
 
     def login(self, email, password):
         with self.connection.cursor() as cursor:
-            sql = "SELECT user_password FROM User_Credentials WHERE email = %s"
+            # Actualiza la consulta SQL para obtener también el id_user
+            sql = "SELECT id_User_Credentials, user_password FROM User_Credentials WHERE email = %s"
             cursor.execute(sql, (email,))
             result = cursor.fetchone()
             if result:
+                user_credentials_id = result['id_User_Credentials']
                 hashed_password = result['user_password']
                 hashed_password_utf8 = hashed_password.encode('utf-8')
                 if bcrypt.checkpw(password.encode('utf-8'), hashed_password_utf8):
-                    return self.create_jwt(email)
-                else:
-                    return None
+                    # Encuentra el id_user asociado a las credenciales del usuario
+                    sql = "SELECT id_user FROM users WHERE id_user_credentials = %s"
+                    cursor.execute(sql, (user_credentials_id,))
+                    user_result = cursor.fetchone()
+                    if user_result:
+                        user_id = user_result['id_user']
+                        return self.create_jwt(email, user_id)
+                return None
             else:
                 return None
 
-    def create_jwt(self, email):
+    def create_jwt(self, email, id_user):
         payload = {
             "email": email,
+            "id_user": id_user,
             "exp": datetime.utcnow() + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -104,6 +124,28 @@ class UserCRUD:
             print(f"Error updating CV path: {e}")
             self.connection.rollback()
             return False
+
+    def get_user_id_by_email(self, email):
+        try:
+            with self.connection.cursor() as cursor:
+                # Consulta para obtener el id_user_credentials basado en el email
+                sql = "SELECT id_User_Credentials FROM User_Credentials WHERE email = %s"
+                cursor.execute(sql, (email,))
+                result = cursor.fetchone()
+                if result:
+                    user_credentials_id = result['id_User_Credentials']
+
+                    # Consulta para obtener el id_user usando id_user_credentials
+                    sql = "SELECT id_user FROM users WHERE id_user_credentials = %s"
+                    cursor.execute(sql, (user_credentials_id,))
+                    result = cursor.fetchone()
+                    if result:
+                        return result['id_user']
+
+                return None
+        except Exception as e:
+            print(f"Error retrieving user ID by email: {e}")
+            return None
 
     def __del__(self):
         self.connection.close()

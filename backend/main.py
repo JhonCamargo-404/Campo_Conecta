@@ -1,4 +1,6 @@
 import json
+import logging
+import shutil
 import uuid
 from datetime import date, timedelta, datetime
 from typing import Optional, List
@@ -80,6 +82,23 @@ class DateRange(BaseModel):
     id_offer: int
 
 
+def get_user_id(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        email = payload.get("email")
+        if not email:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token: email missing")
+
+        user_id = user_crud.get_user_id_by_email(email)
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        return user_id
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
 def verify_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
@@ -94,13 +113,15 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 @app.post("/register/")
 async def register_user(user_data: UserRegistration):
     try:
-        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email, user_data.password, user_data.age)
+        response = user_crud.register_user(user_data.first_name, user_data.last_name, user_data.email,
+                                           user_data.password, user_data.age)
         if response["success"]:
             return {"message": response["message"]}
         else:
             raise HTTPException(status_code=400, detail=response["message"])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # Endpoint para el login de usuarios
 @app.post("/login/")
@@ -123,31 +144,34 @@ async def protected_route(user: dict = Depends(verify_token)):
 
 @app.post("/add_offer/")
 async def add_offer(labor_details: str = Form(...), offer_details: str = Form(...),
-                    host_user_id: int = Form(...), images: List[UploadFile] = File(...)):
+                    images: List[UploadFile] = File(...), token: str = Depends(oauth2_scheme)):
+    user_id = get_user_id(token) # Decodificar el token para obtener el user_id
+    # Obtener o crear host_user
+    host_user = crud_user_offer.get_or_create_host_user(user_id)
+    host_user_id = host_user
+
+    labor_details_model = LaborDetails(**json.loads(labor_details))
+    offer_details_model = OfferDetails(**json.loads(offer_details))
+
+    # Procesar y guardar las imágenes
+    image_paths = save_images(images)
+
     try:
-        # Convertir las cadenas JSON a modelos Pydantic
-        labor_details_model = LaborDetails(**json.loads(labor_details))
-        offer_details_model = OfferDetails(**json.loads(offer_details))
-
-        print(labor_details_model)
-        # Guardar la imagen en el sistema de archivos
-        image_paths = []
-        for image in images:
-            # Generar un nombre de archivo único
-            filename = f"{uuid.uuid4()}_{image.filename}"
-            image_path = f'../backend/offer_images/{filename}'
-
-            # Guardar la imagen
-            with open(image_path, 'wb') as buffer:
-                image_content = await image.read()
-                buffer.write(image_content)
-            image_paths.append(image_path)
-
-        # Añadir la oferta utilizando el método CRUD
         offer_crud.add_offer(labor_details_model.dict(), offer_details_model.dict(), image_paths, host_user_id)
         return {"message": "Offer added successfully"}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+def save_images(images: List[UploadFile]):
+    image_paths = []
+    for image in images:
+        filename = f"{uuid.uuid4()}_{image.filename}"
+        image_path = f'./offer_images/{filename}'
+        with open(image_path, 'wb') as buffer:
+            shutil.copyfileobj(image.file, buffer)
+        image_paths.append(image_path)
+    return image_paths
 
 
 @app.get("/get_offers")

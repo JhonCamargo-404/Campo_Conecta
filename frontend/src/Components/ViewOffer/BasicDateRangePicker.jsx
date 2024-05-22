@@ -28,7 +28,6 @@ export default function BasicDateRangePicker({ offerId, value, onChange }) {
           value={value}
           onChange={onChange}
           shouldDisableDate={(date) => {
-            console.log(disabledDates);
             return disabledDates.some(disabledDate => date.isSame(disabledDate, 'day'));
           }}
         />

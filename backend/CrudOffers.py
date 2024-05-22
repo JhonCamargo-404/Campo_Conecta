@@ -9,7 +9,7 @@ class OfferCRUD:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bryan',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -116,7 +116,7 @@ class OfferCRUD:
                     offer['start_day'] = offer['start_day'].strftime('%Y-%m-%d')
                 if offer['image_path']:
                     cleaned_path = offer['image_path'].replace('../backend/offer_images/', '')
-                    offer['image_url'] = f"http://localhost:8000/offer_images/{cleaned_path}"
+                    offer['image_url'] = f"http://localhost:8000/{cleaned_path}"
                 else:
                     offer['image_url'] = None
 
@@ -126,24 +126,26 @@ class OfferCRUD:
         try:
             with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 sql = """
-                SELECT 
-                    o.id_offer, 
-                    oi.name_offer, 
-                    oi.start_day, 
-                    oi.description, 
-                    oi.coordinates,
-                    hu.id_host_user, 
-                    lc.salary, 
-                    lc.feeding,
-                    oi.id_offer_info,
-                    GROUP_CONCAT(DISTINCT a.id_applicant) AS applicants
-                FROM offer o
-                JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
-                JOIN host_user hu ON o.id_host_user = hu.id_host_user
-                LEFT JOIN applicant a ON o.id_offer = a.id_offer
-                JOIN labor_conditions lc ON o.id_labor_condition = lc.id_labor_condition
-                WHERE o.id_offer = %s
-                GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user, lc.salary, lc.feeding, oi.id_offer_info
+SELECT 
+    o.id_offer, 
+    oi.name_offer, 
+    oi.start_day, 
+    oi.description, 
+    oi.coordinates,
+    hu.id_host_user, 
+    lc.salary, 
+    lc.feeding,
+    oi.id_offer_info,
+    GROUP_CONCAT(DISTINCT oa.id_applicant) AS applicants
+FROM offer o
+JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+JOIN host_user hu ON o.id_host_user = hu.id_host_user
+LEFT JOIN offer_applicant oa ON o.id_offer = oa.id_offer
+LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
+JOIN labor_conditions lc ON o.id_labor_condition = lc.id_labor_condition
+WHERE o.id_offer = %s
+GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user, lc.salary, lc.feeding, oi.id_offer_info
+
                 """
                 cursor.execute(sql, (offer_id,))
                 result = cursor.fetchone()
@@ -177,10 +179,12 @@ class OfferCRUD:
     def get_disabled_dates(self, id_offer):
         try:
             with self.connection.cursor() as cursor:
+                # Consulta actualizada para obtener las fechas de los aplicantes relacionados con una oferta específica
                 sql = """
-                SELECT startDate, finishDate
-                FROM applicant
-                WHERE id_offer = %s
+                SELECT a.startDate, a.finishDate
+                FROM applicant a
+                JOIN offer_applicant oa ON a.id_applicant = oa.id_applicant
+                WHERE oa.id_offer = %s
                 """
                 cursor.execute(sql, (id_offer,))
                 return cursor.fetchall()
@@ -206,14 +210,25 @@ class OfferCRUD:
     def associate_applicant_with_offer(self, id_applicant, id_offer):
         try:
             with self.connection.cursor() as cursor:
-                sql_associate = """
-                UPDATE applicant
-                SET id_offer = %s
-                WHERE id_applicant = %s
+                # Comprobar si la asociación ya existe
+                sql_check = """
+                SELECT COUNT(*) AS count FROM offer_applicant
+                WHERE id_applicant = %s AND id_offer = %s
                 """
-                cursor.execute(sql_associate, (id_offer, id_applicant))
+                cursor.execute(sql_check, (id_applicant, id_offer))
+                result = cursor.fetchone()
+                if result['count'] > 0:
+                    print("Association already exists.")
+                    return False  # La asociación ya existe, no se realiza ninguna acción
+
+                # Insertar una nueva relación en la tabla offer_applicant
+                sql_associate = """
+                INSERT INTO offer_applicant (id_applicant, id_offer)
+                VALUES (%s, %s)
+                """
+                cursor.execute(sql_associate, (id_applicant, id_offer))
                 self.connection.commit()
-                return cursor.rowcount > 0
+                return cursor.rowcount > 0  # Devuelve True si la fila fue insertada correctamente
         except Exception as e:
             print("Error occurred while associating applicant with offer:", e)
             self.connection.rollback()
@@ -236,7 +251,13 @@ class OfferCRUD:
     def check_application(self, id_user, id_offer):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT id_applicant FROM applicant WHERE id_user=%s AND id_offer=%s"
+                # Usar la tabla offer_applicant para verificar la relación entre el aplicante y la oferta
+                sql = """
+                SELECT id_applicant FROM offer_applicant
+                WHERE id_applicant IN (
+                    SELECT id_applicant FROM applicant WHERE id_user=%s
+                ) AND id_offer=%s
+                """
                 cursor.execute(sql, (id_user, id_offer))
                 result = cursor.fetchone()
                 return bool(result)  # Retorna True si encuentra un resultado, False de lo contrario
@@ -258,7 +279,6 @@ class OfferCRUD:
             print(f"Error adding application: {e}")
             self.connection.rollback()
             return False
-
 
     def __del__(self):
         self.connection.close()
