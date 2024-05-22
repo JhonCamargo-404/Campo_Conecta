@@ -23,7 +23,7 @@ const NavBar = () => {
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
             {user ? (
               <>
-                <div className="px-4 py-2 text-sm text-gray-700 font-semibold">{user.name}</div>
+                <div className="px-4 py-2 text-sm text-gray-700 font-semibold">{user.email}</div>
                 <Link to="/Profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <FaRegUser className="mr-2"/> Mi perfil
                 </Link>

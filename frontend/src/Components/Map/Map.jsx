@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Map = ({ isMapOpen, closeMap }) => {
   const [userLocation, setUserLocation] = useState(null);
@@ -88,9 +89,9 @@ const Map = ({ isMapOpen, closeMap }) => {
                 <Popup>
                   <div>
                     <h3>{location.title}</h3>
-                    <a href={`/offer/${location.offerId}`} target="_blank" rel="noopener noreferrer">
+                    <Link to={`/offer/${location.offerId}`}>
                       <img src={location.imageUrl} alt={location.title} style={{ width: '100px', height: 'auto' }} />
-                    </a>
+                    </Link>
                   </div>
                 </Popup>
               </Marker>

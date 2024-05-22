@@ -29,12 +29,12 @@ class OfferCRUD:
 
                 # Insertar en la tabla offer_info
                 sql_offer_info = """
-                INSERT INTO offer_info (name_offer, start_day, description, coordinates) 
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO offer_info (name_offer, start_day, description, municipality, coordinates) 
+                VALUES (%s, %s, %s, %s, %s)
                 """
                 offer_info_values = (
                     offer_details['name_offer'], offer_details['start_day'], offer_details['description'],
-                    offer_details['coordinates'])
+                    offer_details['municipality'], offer_details['coordinates'])
                 cursor.execute(sql_offer_info, offer_info_values)
                 offer_info_id = cursor.lastrowid
 

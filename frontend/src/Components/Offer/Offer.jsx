@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { UploadComponent } from './UploadComponent';
 import NavBar from "../NavBar/NavBar";
 import axios from 'axios';
 import InputField from './InputField';
-import LocationField from './LocationField';
 import SelectField from './SelectField';
 import TextareaField from './TextareaField';
-
+import municipiosData from '../../file/municipios_boyaca_coordenadas.json';  
 
 const Offer = () => {
   const navigate = useNavigate();
@@ -15,6 +14,7 @@ const Offer = () => {
     name_offer: '',
     start_day: '',
     description: '',
+    municipality: '',
     coordinates: '',
     salary: 0,
     feeding: '',
@@ -23,35 +23,31 @@ const Offer = () => {
     images: []
   });
 
-  const handleLocationClick = async () => {
-    if (!navigator.geolocation) {
-      console.error('Geolocation is not supported by your browser');
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      const coordinates = `${latitude},${longitude}`;
-      setFormData(prevState => ({
-        ...prevState,
-        location: 'Ubicación actual seleccionada',
-        coordinates: coordinates  // Asumiendo que tienes un campo para coordenadas
+  useEffect(() => {
+    // Suponiendo que el usuario selecciona el primer municipio por defecto
+    if (municipiosData.length > 0) {
+      const { municipio, latitud, longitud } = municipiosData[0];
+      setFormData(prev => ({
+        ...prev,
+        municipality: municipio,
+        coordinates: `${latitud}, ${longitud}`
       }));
-    }, (error) => {
-      console.error('Error obtaining location', error);
-    });
-  }
+    }
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState, [name]: value }));
 
-    if (name === "images") {
-      setFormData(prevState => ({ ...prevState, [name]: [...files] }));
-    } else if (name === "shift") {
-      const shiftValue = value === "Completa" ? 'D' : 'N';
-      setFormData(prevState => ({ ...prevState, workingDay: shiftValue }));
-    } else {
-      setFormData(prevState => ({ ...prevState, [name]: value }));
+    if (name === "municipality") {
+      const municipioSeleccionado = municipiosData.find(m => m.municipio === value);
+      if (municipioSeleccionado) {
+        const { latitud, longitud } = municipioSeleccionado;
+        setFormData(prev => ({
+          ...prev,
+          coordinates: `${latitud}, ${longitud}`
+        }));
+      }
     }
   };
 
@@ -77,47 +73,25 @@ const Offer = () => {
       name_offer: formData.name_offer,
       start_day: formData.start_day,
       description: formData.description,
+      municipality: formData.municipality,
       coordinates: formData.coordinates
     }));
 
     if (formData.images && formData.images.length > 0) {
-      // Añadir cada archivo de imagen individualmente
-      for (let i = 0; i < formData.images.length; i++) {
-        data.append(`images`, formData.images[i]); // Usa el mismo nombre de campo para cada archivo
-      }
-    } else {
-      console.error('No image file selected');
-      return;
+      formData.images.forEach((image, i) => {
+        data.append(`images`, image);
+      });
     }
-    // Imprime la información del formulario antes de enviarla
-    console.log('Form Data:', Object.fromEntries(data.entries()));
-    
+
     try {
       const response = await axios.post('http://localhost:8000/add_offer/', data, config);
       console.log('Success:', response);
       navigate('/ConfirmOffer');
     } catch (error) {
-      if (error.response) {
-        // El servidor respondió con un estado fuera del rango 2xx
-        console.error('Server responded with error:', error.response.status, error.response.data);
-        if (error.response.status === 401) {
-          // Manejo específico para errores de autenticación
-          alert('Su sesión ha expirado, por favor inicie sesión de nuevo.');
-          // Redirigir al usuario al login o manejar la renovación del token
-        } else if (error.response.status === 500) {
-          alert('Error interno del servidor, por favor intente de nuevo más tarde.');
-        }
-      } else if (error.request) {
-        // La solicitud fue hecha pero no se recibió respuesta
-        console.error('No response received:', error.request);
-        alert('Error de conexión, por favor verifique su conexión a internet.');
-      } else {
-        // Algo más causó el error
-        console.error('Error:', error.message);
-        alert('Ocurrió un error inesperado.');
-      }
+      console.error('Error:', error);
+      alert('Error submitting the offer');
     }
-  }
+  };
 
   return (
     <>
@@ -141,13 +115,12 @@ const Offer = () => {
                 onChange={handleChange}
               />
 
-              <LocationField
+              <SelectField
                 label="Ubicación"
-                name="coordinates"
-                placeholder="Municipio donde reside"
-                value={formData.coordinates}
+                name="municipality"
+                options={municipiosData.map(m => m.municipio)}
+                value={formData.municipality}
                 onChange={handleChange}
-                onClick={handleLocationClick}
               />
 
               <InputField

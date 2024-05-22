@@ -68,6 +68,7 @@ class OfferDetails(BaseModel):
     name_offer: str
     start_day: date
     description: str
+    municipality: str
     coordinates: Optional[str] = None
 
 
