@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Applicants from './Applicants';
+import { jwtDecode } from 'jwt-decode';  
 
 const Advertisements = () => {
   const [postulaciones, setPostulaciones] = useState([]);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const token = sessionStorage.getItem('token');
+  const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
 
   useEffect(() => {
     const fetchPostulaciones = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/get_offers");
+        const response = await axios.get(`http://127.0.0.1:8000/get_offers/${userId}`);
         setPostulaciones(response.data);
       } catch (error) {
         console.error("Error fetching postulaciones:", error);

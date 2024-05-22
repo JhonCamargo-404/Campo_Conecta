@@ -184,6 +184,16 @@ async def get_offers():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/get_offers/{id_user}")
+async def get_offers(id_user: int):
+    try:
+        offers = offer_crud.get_offers_for_user(id_user)
+        return JSONResponse(status_code=200, content=offers)
+    except Exception as e:
+        logging.error(f"Failed to fetch offers: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/get_offer/{offer_id}")
 async def get_offer(offer_id: int):
     offer_details = offer_crud.get_offer_by_id(offer_id)

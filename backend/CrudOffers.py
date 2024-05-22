@@ -122,6 +122,42 @@ class OfferCRUD:
 
             return results
 
+    def get_offers_for_user(self, user_id):
+        with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
+            sql = """
+            SELECT DISTINCT
+                o.id_offer, 
+                oi.name_offer, 
+                oi.start_day, 
+                oi.description, 
+                oi.coordinates,
+                hu.id_host_user, 
+                hu.id_user AS host_user_id,
+                MIN(im.image_path) AS image_path  # Selecciona la primera imagen encontrada
+            FROM offer o
+            JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+            JOIN host_user hu ON o.id_host_user = hu.id_host_user
+            LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
+            LEFT JOIN offer_applicant oa ON o.id_offer = oa.id_offer
+            LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
+            WHERE hu.id_user = %s OR a.id_user = %s
+            GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
+            """
+            cursor.execute(sql, (user_id, user_id))
+            results = cursor.fetchall()
+
+            # Formateando la fecha de inicio y manejo de la ruta de la imagen
+            for offer in results:
+                if offer['start_day'] and isinstance(offer['start_day'], datetime.date):
+                    offer['start_day'] = offer['start_day'].strftime('%Y-%m-%d')
+                if offer['image_path']:
+                    cleaned_path = offer['image_path'].replace('../backend/offer_images/', '')
+                    offer['image_url'] = f"http://localhost:8000/{cleaned_path}"
+                else:
+                    offer['image_url'] = None
+
+            return results
+
     def get_offer_by_id(self, offer_id):
         try:
             with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:

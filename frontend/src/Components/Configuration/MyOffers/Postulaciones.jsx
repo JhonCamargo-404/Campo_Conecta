@@ -37,7 +37,7 @@ const Postulaciones = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
-                <div className="text-gray-700">{postulacion.texto}</div>
+                <div className="text-gray-700">{postulacion.name_offer}</div>
               </div>
               <span className={`px-4 py-1 rounded-full text-sm font-semibold uppercase ${colorClases(postulacion.estado)}`}>
                 {postulacion.estado}
