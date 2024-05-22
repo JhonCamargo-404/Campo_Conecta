@@ -1,27 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';  
 
 const Postulaciones = () => {
-  // Suponiendo que tengas un estado o prop para tus postulaciones
-  const postulaciones = [
-    { estado: 'en revision', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    { estado: 'rechazado', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    { estado: 'aceptado', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    // ... otros estados
-  ];
+    const [postulaciones, setPostulaciones] = useState([]);
+    const token = sessionStorage.getItem('token');
+    const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);  
 
-  // Función para determinar los colores basados en el estado
-  const colorClases = (estado) => {
-    switch(estado) {
-      case 'en revision':
-        return 'text-yellow-500 bg-yellow-100';
-      case 'rechazado':
-        return 'text-red-500 bg-red-100';
-      case 'aceptado':
-        return 'text-green-500 bg-green-100';
-      default:
-        return '';
-    }
-  };
+    useEffect(() => {
+        axios.get(`http://127.0.0.1:8000/get_applications/${userId}`)
+            .then(response => {
+                setPostulaciones(response.data);
+            })
+            .catch(error => console.error('Error fetching applications:', error));
+    }, []);
+
+    const colorClases = (estado) => {
+        switch(estado) {
+            case 'en revision':
+                return 'text-yellow-500 bg-yellow-100';
+            case 'rechazado':
+                return 'text-red-500 bg-red-100';
+            case 'aceptado':
+                return 'text-green-500 bg-green-100';
+            default:
+                return '';
+        }
+    };
 
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-white big-container">

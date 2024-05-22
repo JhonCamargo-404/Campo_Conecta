@@ -145,7 +145,7 @@ async def protected_route(user: dict = Depends(verify_token)):
 @app.post("/add_offer/")
 async def add_offer(labor_details: str = Form(...), offer_details: str = Form(...),
                     images: List[UploadFile] = File(...), token: str = Depends(oauth2_scheme)):
-    user_id = get_user_id(token) # Decodificar el token para obtener el user_id
+    user_id = get_user_id(token)  # Decodificar el token para obtener el user_id
     # Obtener o crear host_user
     host_user = crud_user_offer.get_or_create_host_user(user_id)
     host_user_id = host_user
@@ -287,3 +287,14 @@ async def upload_cv(user_id: int, file: UploadFile = File(...)):
         return {"message": "CV uploaded successfully", "path": path}
     else:
         raise HTTPException(status_code=500, detail="Failed to upload CV")
+
+
+@app.get("/get_applications/{user_id}")
+async def get_applications(user_id: int):
+    try:
+        applications = crud_user_offer.get_user_applications(user_id)
+        if applications is None:
+            raise HTTPException(status_code=404, detail="No applications found")
+        return applications
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

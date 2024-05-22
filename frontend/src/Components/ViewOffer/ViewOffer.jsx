@@ -15,7 +15,7 @@ const ViewOffer = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [offer, setOffer] = useState(null);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
     const [dateRange, setDateRange] = useState([null, null]);
     const [error, setError] = useState('');

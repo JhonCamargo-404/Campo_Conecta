@@ -58,7 +58,7 @@ const Offer = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data',

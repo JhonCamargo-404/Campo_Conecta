@@ -66,3 +66,22 @@ class CrudUserOffer:
             print(f"Unexpected error: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail="An unexpected error occurred")
+
+    def get_user_applications(self, user_id):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                SELECT o.id_offer, oa.estado, oi.name_offer, oi.description
+                FROM offer_applicant oa
+                JOIN offer o ON oa.id_offer = o.id_offer
+                JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+                WHERE oa.id_applicant IN (
+                    SELECT id_applicant FROM applicant WHERE id_user=%s
+                )
+                """
+                cursor.execute(sql, (user_id,))
+                return cursor.fetchall()  # Devuelve una lista de diccionarios con los datos de las ofertas
+        except Exception as e:
+            print(f"Error retrieving user applications: {e}")
+            return []
+

@@ -24,7 +24,7 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("token", data.access_token);
+        sessionStorage.setItem("token", data.access_token);
         const decoded = jwtDecode(data.access_token);
         setUser(decoded);
         navigate("/home", { state: { isLoggedIn: true } });
