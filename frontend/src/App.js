@@ -54,7 +54,6 @@ function App() {
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
         <Route path="/NewPassword" element={<NewPassword />} />
         <Route path="/DeleteUser" element={user ? <DeleteUser /> : <Navigate to="/Login" />} />
-        <Route path="/DeleteOffer" element={user ? <DeleteOffer /> : <Navigate to="/Login" />} />
         <Route path="/DeleteMyAdvertisement" element={user ? <DeleteMyAdvertisement /> : <Navigate to="/Login" />} />
         <Route path="/DeleteUser" element={<DeleteUser />} />
         <Route path="/DeleteMyAdvertisement" element={<DeleteMyAdvertisement />} />
