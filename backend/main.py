@@ -184,7 +184,7 @@ async def get_offers():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/get_offers/{id_user}")
+@app.get("/get_user_offer/{id_user}")
 async def get_offers(id_user: int):
     try:
         offers = offer_crud.get_offers_for_user(id_user)

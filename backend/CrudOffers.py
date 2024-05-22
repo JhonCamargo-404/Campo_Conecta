@@ -122,28 +122,25 @@ class OfferCRUD:
 
             return results
 
-    def get_offers_for_user(self, user_id):
+    def get_offers_for_user(self, id_user):
         with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
             sql = """
-            SELECT DISTINCT
+            SELECT
                 o.id_offer, 
                 oi.name_offer, 
                 oi.start_day, 
                 oi.description, 
                 oi.coordinates,
-                hu.id_host_user, 
-                hu.id_user AS host_user_id,
+                hu.id_host_user,
                 MIN(im.image_path) AS image_path  # Selecciona la primera imagen encontrada
             FROM offer o
             JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
             JOIN host_user hu ON o.id_host_user = hu.id_host_user
             LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
-            LEFT JOIN offer_applicant oa ON o.id_offer = oa.id_offer
-            LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
-            WHERE hu.id_user = %s OR a.id_user = %s
+            WHERE hu.id_user = %s
             GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
             """
-            cursor.execute(sql, (user_id, user_id))
+            cursor.execute(sql, (id_user,))  # Nota la coma después de user_id
             results = cursor.fetchall()
 
             # Formateando la fecha de inicio y manejo de la ruta de la imagen
@@ -162,26 +159,26 @@ class OfferCRUD:
         try:
             with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
                 sql = """
-SELECT 
-    o.id_offer, 
-    oi.name_offer, 
-    oi.start_day, 
-    oi.description, 
-    oi.coordinates,
-    hu.id_host_user, 
-    lc.salary, 
-    lc.feeding,
-    oi.id_offer_info,
-    GROUP_CONCAT(DISTINCT oa.id_applicant) AS applicants
-FROM offer o
-JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
-JOIN host_user hu ON o.id_host_user = hu.id_host_user
-LEFT JOIN offer_applicant oa ON o.id_offer = oa.id_offer
-LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
-JOIN labor_conditions lc ON o.id_labor_condition = lc.id_labor_condition
-WHERE o.id_offer = %s
-GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user, lc.salary, lc.feeding, oi.id_offer_info
-
+                SELECT 
+                    o.id_offer, 
+                    oi.name_offer, 
+                    oi.start_day, 
+                    oi.description, 
+                    oi.coordinates,
+                    hu.id_host_user, 
+                    lc.salary, 
+                    lc.feeding,
+                    oi.id_offer_info,
+                    GROUP_CONCAT(DISTINCT oa.id_applicant) AS applicants
+                FROM offer o
+                JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+                JOIN host_user hu ON o.id_host_user = hu.id_host_user
+                LEFT JOIN offer_applicant oa ON o.id_offer = oa.id_offer
+                LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
+                JOIN labor_conditions lc ON o.id_labor_condition = lc.id_labor_condition
+                WHERE o.id_offer = %s
+                GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user, lc.salary, lc.feeding, oi.id_offer_info
+                
                 """
                 cursor.execute(sql, (offer_id,))
                 result = cursor.fetchone()
