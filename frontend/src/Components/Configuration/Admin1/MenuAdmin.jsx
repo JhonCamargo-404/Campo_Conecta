@@ -14,13 +14,9 @@ const MenuAdmin = () => {
         <LuUser2 className="icon mr-2 align-middle"/>
         Perfil de usuario
       </NavLink>
-      <NavLink to="/SecuritySettings" style={({ isActive }) => isActive ? activeStyle : undefined} className="flex items-center mb-5 no-underline text-black hover:text-blue-700">
+      <NavLink to="/SecuritySettingsAdmin" style={({ isActive }) => isActive ? activeStyle : undefined} className="flex items-center mb-5 no-underline text-black hover:text-blue-700">
         <FaLock className="icon mr-2 align-middle"/>
         Seguridad
-      </NavLink>
-      <NavLink to="/DeleteOffer" style={({ isActive }) => isActive ? activeStyle : undefined} className="flex items-center mb-5 no-underline text-black hover:text-blue-700">
-        <BsFilePost className="icon mr-2 align-middle"/>
-        Postulaciones
       </NavLink>
       <NavLink to="/DeleteMyAdvertisement" style={({ isActive }) => isActive ? activeStyle : undefined} className="flex items-center mb-5 no-underline text-black hover:text-blue-700">
         <RiAdvertisementLine className="icon mr-2 align-middle"/>

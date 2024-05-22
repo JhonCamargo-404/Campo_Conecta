@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './DeleteUser.css'; 
-import NavBar from "../../NavBar/NavBar";
 import MenuAdmin from "./MenuAdmin";
+import NavBarAdmin from './NavBarAdmin';
 
 // Componente para los campos del formulario
 const InputField = ({ label, type, name, value, onChange }) => (
@@ -48,7 +48,7 @@ const DeleteUser = () => {
   return (
     //prueba
     <div className="main-wrapper">
-      <NavBar />
+      <NavBarAdmin />
       <div className="main-container">
         <MenuAdmin />
         <div className="profile-container">
@@ -91,7 +91,6 @@ const DeleteUser = () => {
               </div>
 
               <div className="buttons">
-                <button type="submit" className="update-button">Actualizar perfil</button>
                 <button type="button" className="delete-button" onClick={handleReset}>Borrar perfil</button>
               </div>
             </form>
