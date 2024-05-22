@@ -1,33 +1,35 @@
 footer {
-    background-color: #454D66; /* Fondo claro */
-    color: #333333; /* Color de texto oscuro para contraste */
-    padding: 2rem 0; /* Padding superior e inferior */
-    display: flex;
-    justify-content: space-around; /* Distribuye los elementos uniformemente */
-    align-items: center; /* Alinea los elementos verticalmente */
-  }
-  
-  .footer-column {
-    display: flex;
-    flex-direction: column; /* Organiza los elementos en columnas */
-    align-items: center; /* Centra los elementos de la columna */
-    max-width: 200px; /* Ancho máximo para cada columna */
-    background-color: #ffffff;
-    border-radius: 5%;
-  }
-  
-  .footer-icon {
-    border-radius: 50%; /* Hace el contenedor del ícono redondo */
-    width: 64px; /* Tamaño del ícono o imagen */
-    height: 64px; /* Tamaño del ícono o imagen */
-    display: flex;
-    justify-content: center; /* Centra el ícono horizontalmente */
-    align-items: center; /* Centra el ícono verticalmente */
-    background-color: #eaeaea; /* Fondo para el contenedor del ícono */
-    margin-bottom: 1rem; /* Espacio entre el ícono y el texto debajo */
-  }
-  
-  .footer-text {
-    text-align: center; /* Alinea el texto al centro */
-    font-size: 0.875rem; /* Tamaño del texto */
-  }
+  background-color: #454D66; /* Fondo claro */
+  color: #333333; /* Color de texto oscuro para contraste */
+  padding: 2rem 0; /* Padding superior e inferior */
+  display: flex;
+  justify-content: space-around; /* Distribuye los elementos uniformemente */
+  align-items: center; /* Alinea los elementos verticalmente */
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column; /* Organiza los elementos en columnas */
+  align-items: center; /* Centra los elementos de la columna */
+  max-width: 200px; /* Ancho máximo para cada columna */
+  background-color: #ffffff;
+  border-radius: 5%;
+  padding: 1rem;
+}
+
+.footer-icon {
+  width: 50px; /* Tamaño del ícono o imagen */
+  height: 50px; /* Tamaño del ícono o imagen */
+  display: flex;
+  justify-content: center; /* Centra el ícono horizontalmente */
+  align-items: center; /* Centra el ícono verticalmente */
+  margin-bottom: 1rem; /* Espacio entre el ícono y el texto debajo */
+  background-size: cover; /* Ajusta el tamaño de la imagen de fondo */
+  background-position: center; /* Centra la imagen de fondo */
+  border-radius: 2vh; /* Hace el contenedor del ícono redondo */
+}
+
+.footer-text {
+  text-align: center; /* Alinea el texto al centro */
+  font-size: 0.875rem; /* Tamaño del texto */
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import NavBar from "../../NavBar/NavBar";
+import NavBar from "./NavBarAdmin";
 import MenuAdmin from "./MenuAdmin";
 import DeleteAdvertisements from "./DeleteAdvertisements"; 
 
