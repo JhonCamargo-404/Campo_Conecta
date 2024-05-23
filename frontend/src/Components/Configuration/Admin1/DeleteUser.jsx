@@ -1,104 +1,69 @@
-import React, { useState } from 'react';
-import './DeleteUser.css'; 
-import MenuAdmin from "./MenuAdmin";
-import NavBarAdmin from './NavBarAdmin';
-
-// Componente para los campos del formulario
-const InputField = ({ label, type, name, value, onChange }) => (
-  <div className="input-group">
-    <label htmlFor={name}>{label}</label>
-    <input
-      type={type}
-      name={name}
-      id={name}
-      value={value}
-      onChange={onChange}
-      className="input-field"
-    />
-  </div>
-);
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const DeleteUser = () => {
-  const [profile, setProfile] = useState({
-    firstName: '',
-    lastName: '',
-    phoneNumber: '',
-    email: '',
-  });
+    const [users, setUsers] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
-  };
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/get_users`);
+                setUsers(response.data);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Lógica para manejar la actualización del perfil
-  };
+        fetchUsers();
+    }, []);
 
-  const handleReset = () => {
-    setProfile({
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      email: '',
-    });
-  };
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar el usuario?");
+        if (confirmDelete) {
+            try {
+                await axios.delete(`http://127.0.0.1:8000/delete_user/${id}`);
+                setUsers(users.filter(user => user.id_user !== id));
+            } catch (error) {
+                console.error("Error deleting offer:", error);
+            }
+        }
+    };
 
-  return (
-    //prueba
-    <div className="main-wrapper">
-      <NavBarAdmin />
-      <div className="main-container">
-        <MenuAdmin />
-        <div className="profile-container">
-          <div className="profile-section">
-            <h2>Perfil de usuario</h2>
-            <h3>Información de la cuenta</h3>
-            <form onSubmit={handleSubmit} className="profile-form">
-              <div className="form-row">
-                <InputField
-                  label="Nombres"
-                  type="text"
-                  name="firstName"
-                  value={profile.firstName}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Apellidos"
-                  type="text"
-                  name="lastName"
-                  value={profile.lastName}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-row">
-                <InputField
-                  label="Número"
-                  type="tel"
-                  name="phoneNumber"
-                  value={profile.phoneNumber}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Email"
-                  type="email"
-                  name="email"
-                  value={profile.email}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="buttons">
-                <button type="button" className="delete-button" onClick={handleReset}>Borrar perfil</button>
-              </div>
-            </form>
-          </div>
+    return (
+        <div className="flex flex-col items-center justify-center py-10 bg-white big-container">
+            <div className="w-full max-w-4xl px-4">
+                <h1 className="text-4xl font-bold text-gray-700 mb-8 text-center">Anuncios publicados</h1>
+                {users.map((user, index) => (
+                    <div key={index} className="bg-white p-6 rounded-lg shadow-md mb-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                                <div className="flex flex-col">
+                                    <div className="font-bold text-gray-700">{`${user.user_name} ${user.user_last_name}`}</div>
+                                    <div className="text-gray-700">{user.email}</div>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="flex justify-end mt-4 space-x-3">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(user.id_user);
+                                }}
+                                className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                ))}
+                <div className="flex justify-center mt-4">
+                    <button className="px-8 py-2 border rounded-full border-gray-300 text-gray-700 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-opacity-50">
+                        Cargar más
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default DeleteUser;

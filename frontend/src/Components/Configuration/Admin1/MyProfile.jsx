@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './MyProfile.css'; 
-import NavBar from "../../NavBar/NavBar";
-import SideMenu from "../SideMenu/SideMenu";
+import MenuAdmin from "./MenuAdmin";
+import NavBarAdmin from './NavBarAdmin';
 
 // Componente para los campos del formulario
 const InputField = ({ label, type, name, value, onChange }) => (
@@ -18,7 +18,7 @@ const InputField = ({ label, type, name, value, onChange }) => (
   </div>
 );
 
-const UserProfile = () => {
+const MyProfile = () => {
   const [profile, setProfile] = useState({
     firstName: '',
     lastName: '',
@@ -46,13 +46,14 @@ const UserProfile = () => {
   };
 
   return (
+    //prueba
     <div className="main-wrapper">
-      <NavBar />
+      <NavBarAdmin />
       <div className="main-container">
-        <SideMenu />
+        <MenuAdmin />
         <div className="profile-container">
           <div className="profile-section">
-            <h2>Mi perfil</h2>
+            <h2>Perfil de usuario</h2>
             <h3>Información de la cuenta</h3>
             <form onSubmit={handleSubmit} className="profile-form">
               <div className="form-row">
@@ -88,7 +89,7 @@ const UserProfile = () => {
                   onChange={handleChange}
                 />
               </div>
-
+              
               <div className="buttons">
                 <button type="submit" className="update-button">Actualizar perfil</button>
                 <button type="button" className="delete-button" onClick={handleReset}>Borrar todo</button>
@@ -101,4 +102,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default MyProfile;

@@ -19,7 +19,7 @@ const NavBarAdmin = () => {
         {isOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
             <div className="px-4 py-2 text-sm text-gray-700 font-semibold">Ngoc Pham</div>
-            <Link to="/DeleteUser" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+            <Link to="/MyProfile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
               <FaRegUser className="mr-2"/> Perfil de usuarios
             </Link>
             <Link to="/SecuritySettingsAdmin" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

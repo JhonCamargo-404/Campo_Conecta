@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const DeleteAdvertisements = () => {
   const [postulaciones, setPostulaciones] = useState([]);
@@ -6,9 +7,8 @@ const DeleteAdvertisements = () => {
   useEffect(() => {
     const fetchPostulaciones = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/get_offers");
-        const data = await response.json();
-        setPostulaciones(data);
+        const response = await axios.get(`http://127.0.0.1:8000/get_offer`);
+        setPostulaciones(response.data);
       } catch (error) {
         console.error("Error fetching postulaciones:", error);
       }
@@ -16,6 +16,18 @@ const DeleteAdvertisements = () => {
 
     fetchPostulaciones();
   }, []);
+  
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta oferta?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(`http://127.0.0.1:8000/delete_offer/${id}`);
+        setPostulaciones(postulaciones.filter(postulacion => postulacion.id_offer !== id));
+      } catch (error) {
+        console.error("Error deleting offer:", error);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-white big-container">
@@ -25,15 +37,21 @@ const DeleteAdvertisements = () => {
           <div key={index} className="bg-white p-6 rounded-lg shadow-md mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                {postulacion.image_url ? (
+                  <img src={postulacion.image_url} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
+                ) : (
+                  <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                )}
                 <div className="text-gray-700">{postulacion.name_offer}</div>
               </div>
             </div>
             <div className="flex justify-end mt-4 space-x-3">
-              <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
-                Editar
-              </button>
-              <button className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
+            <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(postulacion.id_offer);
+                }} 
+                className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
                 Eliminar
               </button>
             </div>

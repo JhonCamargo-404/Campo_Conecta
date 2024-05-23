@@ -16,10 +16,10 @@ import Calendar from './Components/Calendar/Calendar';
 import ViewOffer from './Components/ViewOffer/ViewOffer';
 import ForgotPassword from './Components/ForgotPassword/ForgotPassword';
 import NewPassword from './Components/NewPassword/NewPassword';
-import DeleteUser from './Components/Configuration/Admin1/DeleteUser';
+import MyProfile from './Components/Configuration/Admin1/MyProfile';
+import DeleteUsers from './Components/Configuration/Admin1/DeleteUsersContainer';
 import DeleteMyAdvertisement from './Components/Configuration/Admin1/DeleteMyAdvertisement';
 import { AuthContext } from './context/AuthContext';
-import NavBar from './Components/NavBar/NavBar';
 import HomeAdmin from './Components/Configuration/Admin1/HomeAdmin';
 
 
@@ -53,9 +53,9 @@ function App() {
         <Route path="/offer/:id" element={<ViewOffer />} />
         <Route path="/ForgotPassword" element={<ForgotPassword />} />
         <Route path="/NewPassword" element={<NewPassword />} />
-        <Route path="/DeleteUser" element={user ? <DeleteUser /> : <Navigate to="/Login" />} />
+        <Route path="/MyProfile" element={user ? <MyProfile /> : <Navigate to="/Login" />} />
         <Route path="/DeleteMyAdvertisement" element={user ? <DeleteMyAdvertisement /> : <Navigate to="/Login" />} />
-        <Route path="/DeleteUser" element={<DeleteUser />} />
+        <Route path="/DeleteUsers" element={<DeleteUsers />} />
         <Route path="/DeleteMyAdvertisement" element={<DeleteMyAdvertisement />} />
         <Route path="/HomeAdmin" element={<HomeAdmin />} />
       </Routes>

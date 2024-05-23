@@ -28,10 +28,14 @@ const Login = () => {
         localStorage.setItem("token", data.access_token);    
         const decoded = jwtDecode(data.access_token);
         setUser(decoded);
-        navigate("/home", { state: { isLoggedIn: true } });
+        if (decoded.rol === 'A') {
+          navigate("/HomeAdmin", { state: { isLoggedIn: true } });
+        } else if (decoded.rol === 'U') {
+          navigate("/home", { state: { isLoggedIn: true } });
+        }
       } else {
         const data = await response.json();
-        alert(data.detail);
+        console.log(data);
       }
     } catch (error) {
       console.error("Error logging in:", error);

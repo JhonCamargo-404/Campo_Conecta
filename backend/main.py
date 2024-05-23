@@ -124,6 +124,19 @@ async def register_user(user_data: UserRegistration):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/registerAdmin/")
+async def register_admin(user_data: UserRegistration):
+    try:
+        response = user_crud.register_admin(user_data.first_name, user_data.last_name, user_data.email,
+                                            user_data.password, user_data.age)
+        if response["success"]:
+            return {"message": response["message"]}
+        else:
+            raise HTTPException(status_code=400, detail=response["message"])
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # Endpoint para el login de usuarios
 @app.post("/login/")
 async def login_user(user_data: UserLogin):
@@ -173,6 +186,28 @@ def save_images(images: List[UploadFile]):
             shutil.copyfileobj(image.file, buffer)
         image_paths.append(image_path)
     return image_paths
+
+
+@app.get("/get_users")
+async def get_users():
+    try:
+        offers = user_crud.get_users()
+        return JSONResponse(status_code=200, content=offers)
+    except Exception as e:
+        logging.error(f"Failed to fetch offers: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/delete_user/{user_id}")
+async def delete_user(user_id: int):
+    try:
+        deleted = user_crud.delete_user(user_id)
+        if deleted:
+            return {"message": "User deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="User not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/get_offers")
