@@ -26,11 +26,11 @@ const Offer = () => {
   useEffect(() => {
     // Suponiendo que el usuario selecciona el primer municipio por defecto
     if (municipiosData.length > 0) {
-      const { municipio, latitud, longitud } = municipiosData[0];
+      const { Municipio, Latitud, Longitud } = municipiosData[0];
       setFormData(prev => ({
         ...prev,
-        municipality: municipio,
-        coordinates: `${latitud}, ${longitud}`
+        municipality: Municipio,
+        coordinates: `${Latitud}, ${Longitud}`
       }));
     }
   }, []);
@@ -40,12 +40,12 @@ const Offer = () => {
     setFormData(prevState => ({ ...prevState, [name]: value }));
 
     if (name === "municipality") {
-      const municipioSeleccionado = municipiosData.find(m => m.municipio === value);
+      const municipioSeleccionado = municipiosData.find(m => m.Municipio === value);
       if (municipioSeleccionado) {
-        const { latitud, longitud } = municipioSeleccionado;
+        const { Latitud, Longitud } = municipioSeleccionado;
         setFormData(prev => ({
           ...prev,
-          coordinates: `${latitud}, ${longitud}`
+          coordinates: `${Latitud}, ${Longitud}`
         }));
       }
     }
@@ -118,7 +118,7 @@ const Offer = () => {
               <SelectField
                 label="Ubicación"
                 name="municipality"
-                options={municipiosData.map(m => m.municipio)}
+                options={municipiosData.map(m => m.Municipio)}
                 value={formData.municipality}
                 onChange={handleChange}
               />
