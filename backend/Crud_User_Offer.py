@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from starlette import status
 import pymysql.cursors
 
+
 class CrudUserOffer:
     def __init__(self, db_url):
         self.connection = pymysql.connect(
@@ -67,21 +68,53 @@ class CrudUserOffer:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail="An unexpected error occurred")
 
-    def get_user_applications(self, user_id):
+    def get_user_applications(self, id_user):
         try:
             with self.connection.cursor() as cursor:
                 sql = """
-                SELECT o.id_offer, oa.estado, oi.name_offer, oi.description
-                FROM offer_applicant oa
-                JOIN offer o ON oa.id_offer = o.id_offer
-                JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
-                WHERE oa.id_applicant IN (
-                    SELECT id_applicant FROM applicant WHERE id_user=%s
-                )
+                        SELECT 
+                            o.id_offer, 
+                            oa.estado, 
+                            oi.name_offer, 
+                            oi.description,
+                            MIN(io.image_path) AS image_path  
+                        FROM offer_applicant oa
+                        JOIN offer o ON oa.id_offer = o.id_offer
+                        JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+                        LEFT JOIN image_offer io ON oi.id_offer_info = io.id_offer_info  
+                        WHERE oa.id_applicant IN (
+                            SELECT id_applicant FROM applicant WHERE id_user=%s
+                        )
+                        GROUP BY o.id_offer, oa.estado, oi.name_offer, oi.description 
                 """
-                cursor.execute(sql, (user_id,))
-                return cursor.fetchall()  # Devuelve una lista de diccionarios con los datos de las ofertas
+                cursor.execute(sql, (id_user,))
+                results = cursor.fetchall()
+
+                for offer in results:
+                    if offer['image_path']:
+                        # Asegúrate de que la ruta de la imagen es accesible públicamente y correcta
+                        offer['image_url'] = f"http://localhost:8000/offer_images/{offer['image_path'].split('/')[-1]}"
+                    else:
+                        offer['image_url'] = None
+                return results
         except Exception as e:
             print(f"Error retrieving user applications: {e}")
             return []
 
+    def update_applicant_status(self, id_applicant: int, status: str):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                      UPDATE offer_applicant
+                      SET estado = %s
+                      WHERE id_applicant = %s
+                  """
+                cursor.execute(sql, (status, id_applicant))
+                if cursor.rowcount == 0:
+                    raise HTTPException(status_code=404, detail="Applicant not found")
+                self.connection.commit()
+                return {"success": True, "message": f"Applicant status updated to {status}"}
+        except pymysql.MySQLError as e:
+            print(f"Database error: {e}")
+            self.connection.rollback()
+            raise HTTPException(status_code=500, detail="Failed to update applicant status")

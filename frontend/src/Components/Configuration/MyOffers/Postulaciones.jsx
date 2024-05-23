@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';  
+import { jwtDecode } from 'jwt-decode';
 
 const Postulaciones = () => {
-    const [postulaciones, setPostulaciones] = useState([]);
-    const token = sessionStorage.getItem('token');
-    const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);  
+  const [postulaciones, setPostulaciones] = useState([]);
+  const token = sessionStorage.getItem('token');
+  const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
 
-    useEffect(() => {
-        axios.get(`http://127.0.0.1:8000/get_applications/${userId}`)
-            .then(response => {
-                setPostulaciones(response.data);
-            })
-            .catch(error => console.error('Error fetching applications:', error));
-    }, []);
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/get_applications/${userId}`)
+      .then(response => {
+        setPostulaciones(response.data);
+      })
+      .catch(error => console.error('Error fetching applications:', error));
+  }, []);
 
-    const colorClases = (estado) => {
-        switch(estado) {
-            case 'en revision':
-                return 'text-yellow-500 bg-yellow-100';
-            case 'rechazado':
-                return 'text-red-500 bg-red-100';
-            case 'aceptado':
-                return 'text-green-500 bg-green-100';
-            default:
-                return '';
-        }
-    };
+  const colorClases = (estado) => {
+    switch (estado) {
+      case 'en revision':
+        return 'text-yellow-500 bg-yellow-100';
+      case 'rechazado':
+        return 'text-red-500 bg-red-100';
+      case 'aceptado':
+        return 'text-green-500 bg-green-100';
+      default:
+        return '';
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-white big-container">
@@ -36,7 +36,11 @@ const Postulaciones = () => {
           <div key={index} className="bg-white p-6 rounded-lg shadow-md mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                {postulacion.image_url ? (
+                  <img src={postulacion.image_url} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
+                ) : (
+                  <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                )}
                 <div className="text-gray-700">{postulacion.name_offer}</div>
               </div>
               <span className={`px-4 py-1 rounded-full text-sm font-semibold uppercase ${colorClases(postulacion.estado)}`}>

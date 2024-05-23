@@ -335,12 +335,22 @@ async def upload_cv(user_id: int, file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail="Failed to upload CV")
 
 
-@app.get("/get_applications/{user_id}")
-async def get_applications(user_id: int):
+@app.get("/get_applications/{id_user}")
+async def get_applications(id_user: int):
     try:
-        applications = crud_user_offer.get_user_applications(user_id)
+        applications = crud_user_offer.get_user_applications(id_user)
         if applications is None:
             raise HTTPException(status_code=404, detail="No applications found")
         return applications
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/accept_applicant/{id_applicant}")
+async def accept_applicant(id_applicant: int):
+    return crud_user_offer.update_applicant_status(id_applicant, "aceptado")
+
+
+@app.post("/reject_applicant/{id_applicant}")
+async def reject_applicant(id_applicant: int):
+    return crud_user_offer.update_applicant_status(id_applicant, "rechazado")

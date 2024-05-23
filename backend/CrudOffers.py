@@ -140,7 +140,7 @@ class OfferCRUD:
             WHERE hu.id_user = %s
             GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
             """
-            cursor.execute(sql, (id_user,))  # Nota la coma después de user_id
+            cursor.execute(sql, (id_user,))
             results = cursor.fetchall()
 
             # Formateando la fecha de inicio y manejo de la ruta de la imagen

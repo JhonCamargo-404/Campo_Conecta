@@ -32,6 +32,32 @@ const Applicants = ({ offerId, closeModal }) => {
     setSelectedCv(null);
   };
 
+  const handleAccept = async (applicantId) => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:8000/accept_applicant/${applicantId}`);
+      if (response.data.success) {
+        alert('Postulación aceptada');
+        // Aquí podrías también actualizar el estado en el frontend si es necesario
+      }
+    } catch (error) {
+      console.error('Error al aceptar postulación:', error);
+      alert('Error al procesar la solicitud');
+    }
+  };
+
+  const handleReject = async (applicantId) => {
+    try {
+      const response = await axios.post(`http://127.0.0.1:8000/reject_applicant/${applicantId}`);
+      if (response.data.success) {
+        alert('Postulación rechazada');
+        // Igual que con aceptar, actualizar estado en el frontend si es necesario
+      }
+    } catch (error) {
+      console.error('Error al rechazar postulación:', error);
+      alert('Error al procesar la solicitud');
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl relative">
@@ -41,11 +67,7 @@ const Applicants = ({ offerId, closeModal }) => {
           {applicants.map((applicant, index) => (
             <div key={index} className="bg-gray-100 p-4 rounded-lg flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                {applicant.cv ? (
-                  <img src={applicant.cv} alt={applicant.user_name} className="w-12 h-12 rounded-full" />
-                ) : (
-                  <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
-                )}
+                <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
                 <div className="text-gray-700">
                   <div>{applicant.user_name} {applicant.user_last_name}</div>
                   <div className="text-sm text-gray-500">{applicant.email}</div>
@@ -56,10 +78,10 @@ const Applicants = ({ offerId, closeModal }) => {
                 <button className="p-2 bg-gray-200 rounded-full" onClick={() => handlePdfView(applicant.cv)}>
                   <i className="fas fa-eye"></i>
                 </button>
-                <button className="p-2 bg-green-200 rounded-full">
+                <button className="p-2 bg-green-200 rounded-full" onClick={() => handleAccept(applicant.id_applicant)}>
                   <i className="fas fa-check"></i>
                 </button>
-                <button className="p-2 bg-red-200 rounded-full">
+                <button className="p-2 bg-red-200 rounded-full" onClick={() => handleReject(applicant.id_applicant)}>
                   <i className="fas fa-times"></i>
                 </button>
               </div>
