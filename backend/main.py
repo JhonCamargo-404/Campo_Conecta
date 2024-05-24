@@ -8,9 +8,10 @@ from typing import Optional, List
 from fastapi import FastAPI, HTTPException, UploadFile, File, status, Form, Path, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 from starlette.staticfiles import StaticFiles
+from MailSender import enviar_correo
 
 import jwt
 from Crud_User import UserCRUD
@@ -354,3 +355,108 @@ async def accept_applicant(id_applicant: int):
 @app.post("/reject_applicant/{id_applicant}")
 async def reject_applicant(id_applicant: int):
     return crud_user_offer.update_applicant_status(id_applicant, "rechazado")
+
+class PasswordReset(BaseModel):
+    email: EmailStr
+    new_password: str
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+@app.post("/forgot-password/")
+async def forgot_password(request: PasswordResetRequest):
+    email = request.email
+    user_exists = user_crud.get_user_id_by_email(email)
+    if not user_exists:
+        raise HTTPException(status_code=404, detail="User not found")
+    asunto = "Cambio de contraseña"
+    contenido_html = f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cambio de contraseña</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                background-color: #f6f6f6;
+                margin: 0;
+                padding: 0;
+            }}
+            .container {{
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                text-align: center;
+                padding: 20px 0;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 8px 8px 0 0;
+            }}
+            .content {{
+                padding: 20px;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 10px 20px;
+                margin: 20px 0;
+                font-size: 16px;
+                color: white;
+                background-color: #4CAF50;
+                text-decoration: none;
+                border-radius: 5px;
+                text-align: center;
+            }}
+            .footer {{
+                text-align: center;
+                padding: 20px;
+                font-size: 12px;
+                color: #777777;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Cambio de Contraseña</h1>
+            </div>
+            <div class="content">
+                <p>Hola,</p>
+                <p>Hemos recibido una solicitud para cambiar su contraseña. Haga clic en el siguiente enlace para proceder:</p>
+                <a href="http://localhost:3000/NewPassword" class="button">Cambiar contraseña</a>
+                <p>Si no solicitó este cambio, por favor ignore este correo.</p>
+            </div>
+            <div class="footer">
+                <p>© 2024 CampoConecta. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    # Enviar el correo electrónico utilizando la función de mailsender
+    resultado = enviar_correo(email, asunto, contenido_html)
+    
+    if resultado['status_code'] is None:
+        raise HTTPException(status_code=500, detail=f"Error al enviar el correo: {resultado['error']}")
+    
+    return {"message": "Correo de recuperación enviado"}
+
+@app.post("/reset-password/")
+async def reset_password(reset_data: PasswordReset):
+    try:
+        email = reset_data.email
+        new_password = reset_data.new_password
+
+        # Llama al método update_password del CRUD de usuario
+        user_crud.update_password(email, new_password)
+        
+        return {"message": "Password updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

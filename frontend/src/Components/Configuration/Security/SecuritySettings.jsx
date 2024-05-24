@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import NavBar from "../../NavBar/NavBar";
 import SideMenu from "../SideMenu/SideMenu";
-
+import axios from 'axios';
+import { AuthContext } from "../../../context/AuthContext";
 
 const UpdatePasswordModal = ({ isOpen, onClose }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const { user} = useContext(AuthContext);
   
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     if (!newPassword.trim() || !confirmPassword.trim()) {
       setError('Todos los campos son obligatorios.');
@@ -18,9 +20,18 @@ const UpdatePasswordModal = ({ isOpen, onClose }) => {
       setError('Las contraseñas no coinciden.');
       return;
     }
-    // Aquí puedes agregar la lógica para actualizar la contraseña en el backend.
-    setError('');
-    onClose(); // Cerrar modal si todo está correcto.
+    try {
+      const response = await axios.post("http://localhost:8000/reset-password/", {
+        email: user.email, // Reemplaza 'email_del_usuario' con el email del usuario actual
+        new_password: newPassword
+      });
+      console.log(response.data.message); // Mensaje de éxito del servidor
+      setError('');
+      onClose(); // Cerrar modal si todo está correcto.
+    } catch (error) {
+      console.error('Error al actualizar la contraseña:', error);
+      setError('Error al actualizar la contraseña. Por favor, inténtelo de nuevo.');
+    }
   };
 
   const handleBackgroundClick = (e) => {

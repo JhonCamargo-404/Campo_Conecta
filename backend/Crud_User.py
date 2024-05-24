@@ -10,7 +10,7 @@ class UserCRUD:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='bryan',
+            password='root',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -115,11 +115,7 @@ class UserCRUD:
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         return token
 
-    def update_password(self, email, current_password, new_password):
-        if not self.login(email, current_password):
-            print("Credenciales incorrectas. No se puede actualizar la contraseña.")
-            return
-
+    def update_password(self, email, new_password):
         hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
 
         with self.connection.cursor() as cursor:
@@ -128,7 +124,8 @@ class UserCRUD:
 
         self.connection.commit()
         print("Contraseña actualizada con éxito.")
-
+        
+        
     def get_cv(self, user_id):
         try:
             with self.connection.cursor() as cursor:
