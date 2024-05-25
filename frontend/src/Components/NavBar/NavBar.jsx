@@ -3,7 +3,6 @@ import { BsFilePost } from "react-icons/bs";
 import { FaRegUser, FaLock, FaAd, FaSignOutAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import logo from '../../Assets/Campo-Conecta.png';
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,9 +10,7 @@ const NavBar = () => {
 
   return (
     <nav className="h-12 z-50 flex items-center px-4 bg-custom-green">
-      <div className="text-white text-lg mr-8">
-        <img src={logo} alt="Logo" style={{ height: '50px' }} />
-      </div>
+      <div className="text-white text-lg mr-8">LOGO</div>
       <div className="flex items-center">
         <Link to="/Home" className="text-white no-underline ml-8 text-sm">Inicio</Link>
         {user && <Link to="/Offer" className="text-white no-underline ml-8 text-sm">Crear oferta</Link>}
@@ -28,28 +25,28 @@ const NavBar = () => {
               <>
                 <div className="px-4 py-2 text-sm text-gray-700 font-semibold">{user.email}</div>
                 <Link to="/Profile" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaRegUser className="mr-2" /> Mi perfil
+                  <FaRegUser className="mr-2"/> Mi perfil
                 </Link>
                 <Link to="/SecuritySettings" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaLock className="mr-2" /> Seguridad
+                  <FaLock className="mr-2"/> Seguridad
                 </Link>
                 <Link to="/MyOffers" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <BsFilePost className="mr-2" /> Mis postulaciones
+                  <BsFilePost className="mr-2"/> Mis postulaciones
                 </Link>
                 <Link to="/MyAdvertisements" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaAd className="mr-2" /> Mis anuncios
+                  <FaAd className="mr-2"/> Mis anuncios
                 </Link>
                 <button onClick={logout} className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaSignOutAlt className="mr-2" /> Cerrar sesión
+                  <FaSignOutAlt className="mr-2"/> Cerrar sesión
                 </button>
               </>
             ) : (
               <>
                 <Link to="/Login" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaLock className="mr-2" /> Iniciar sesión
+                  <FaLock className="mr-2"/> Iniciar sesión
                 </Link>
                 <Link to="/Register" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaRegUser className="mr-2" /> Registrarse
+                  <FaRegUser className="mr-2"/> Registrarse
                 </Link>
               </>
             )}
