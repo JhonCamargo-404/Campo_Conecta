@@ -8,7 +8,7 @@ class CrudUserOffer:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bryan',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -26,10 +26,10 @@ class CrudUserOffer:
                     iu.age,
                     iu.cv
                 FROM offer_applicant oa
-                JOIN applicant a ON oa.id_applicant = a.id_applicant
-                JOIN users u ON a.id_user = u.id_user
-                JOIN user_Credentials ic ON u.id_user_credentials = ic.id_User_Credentials
-                JOIN info_User iu ON u.id_info_user = iu.id_info_user
+                LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
+                LEFT JOIN users u ON a.id_user = u.id_user
+                LEFT JOIN user_Credentials ic ON u.id_user_credentials = ic.id_User_Credentials
+                LEFT JOIN info_User iu ON u.id_info_user = iu.id_info_user
                 WHERE oa.id_offer = %s
                 """
                 cursor.execute(sql, (id_offer,))

@@ -240,23 +240,6 @@ async def get_offer(offer_id: int):
         raise HTTPException(status_code=404, detail="Offer not found")
 
 
-@app.post("/add_offer_info/")
-async def add_offer_info(name_offer: str = Form(...),
-                         start_day: date = Form(...),
-                         description: str = Form(...),
-                         coordinates: Optional[str] = Form(None),
-                         image: UploadFile = File(...)):
-    try:
-        # Leer los datos de la imagen
-        image_data = await image.read()
-
-        # Insertar en la base de datos
-        offer_id = offer_crud.add_offer_info(name_offer, start_day, description, coordinates, image_data)
-        return {"message": "Offer info added successfully", "offer_id": offer_id}
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-
 @app.post("/submit-dates")
 async def submit_dates(date_range: DateRange):
     id_applicant = offer_crud.add_applicant(date_range.id_user, date_range.startDate, date_range.endDate)

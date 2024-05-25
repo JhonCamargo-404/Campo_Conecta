@@ -37,7 +37,6 @@ const Applicants = ({ offerId, closeModal }) => {
       const response = await axios.post(`http://127.0.0.1:8000/accept_applicant/${applicantId}`);
       if (response.data.success) {
         alert('Postulación aceptada');
-        // Aquí podrías también actualizar el estado en el frontend si es necesario
       }
     } catch (error) {
       console.error('Error al aceptar postulación:', error);
@@ -50,7 +49,6 @@ const Applicants = ({ offerId, closeModal }) => {
       const response = await axios.post(`http://127.0.0.1:8000/reject_applicant/${applicantId}`);
       if (response.data.success) {
         alert('Postulación rechazada');
-        // Igual que con aceptar, actualizar estado en el frontend si es necesario
       }
     } catch (error) {
       console.error('Error al rechazar postulación:', error);
