@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 SECRET_KEY = 'your_secret_key'
 
+
 class UserCRUD:
     def __init__(self, db_url):
         self.connection = pymysql.connect(
