@@ -10,7 +10,7 @@ import municipalitiesData from "../../file/municipios_boyaca_coordenadas.json";
 const OfferCard = ({ id, title, description, start_day, image_url }) => {
   return (
     <Link to={`/offer/${id}`} style={{ textDecoration: 'none' }}>
-      <div className="w-3/5 h-42 mx-auto bg-white rounded-lg shadow-md p-4 mb-4 flex items-center justify-start gap-4">
+      <div className="w-full h-42 mx-auto bg-white rounded-lg shadow-md p-4 mb-4 flex items-center justify-start gap-4">
         <img src={image_url} alt="Offer" className="w-24 h-auto object-cover" />
         <div className="text-left flex flex-col justify-center">
           <h3 className="my-2">{title}</h3>
