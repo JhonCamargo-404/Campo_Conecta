@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';  
+import {jwtDecode} from 'jwt-decode';  
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';
@@ -25,10 +25,6 @@ const ViewOffer = () => {
     const [files, setFiles] = useState([]);  // Estado para manejar los archivos
 
     useEffect(() => {
-        if (!userId) {
-            navigate('/login'); // Redirigir al login si no hay userId
-        }
-
         const fetchOfferDetails = async () => {
             const response = await axios.get(`http://127.0.0.1:8000/get_offer/${id}`);
             const data = response.data;
@@ -36,17 +32,21 @@ const ViewOffer = () => {
         };
 
         const fetchAppliedStatus = async () => {
-            const response = await axios.get(`http://localhost:8000/has_applied/${userId}/${id}`);
-            setHasApplied(response.data.has_applied);
+            if (userId) {
+                const response = await axios.get(`http://localhost:8000/has_applied/${userId}/${id}`);
+                setHasApplied(response.data.has_applied);
+            }
         };
 
         const fetchCv = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/get_cv/${userId}`);
-                if (response.data.cv) {
-                    setCv(response.data.cv);  // Si el CV existe, lo establece
-                } else {
-                    setIsUploadModalOpen(true);  // Si no hay CV, abre el modal para subir uno
+                if (userId) {
+                    const response = await axios.get(`http://localhost:8000/get_cv/${userId}`);
+                    if (response.data.cv) {
+                        setCv(response.data.cv);  // Si el CV existe, lo establece
+                    } else {
+                        setIsUploadModalOpen(true);  // Si no hay CV, abre el modal para subir uno
+                    }
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
@@ -58,11 +58,10 @@ const ViewOffer = () => {
             }
         };
 
-
         fetchOfferDetails();
         fetchAppliedStatus();
         fetchCv();
-    }, [id, userId, navigate]);
+    }, [id, userId]);
 
     const handleDateChange = (newValue) => {
         setDateRange(newValue);
@@ -116,6 +115,10 @@ const ViewOffer = () => {
         }
     };
 
+    const handleLoginClick = () => {
+        navigate('/login');
+    };
+
     if (!offer) return <div>Loading...</div>;
 
     return (
@@ -136,9 +139,15 @@ const ViewOffer = () => {
                                 onChange={handleDateChange}
                             />
                             <div className="apply-button-container">
-                                <button className="apply-button" onClick={handleApplyClick} disabled={hasApplied}>
-                                    {hasApplied ? 'Ya Aplicaste' : 'Aplicar'}
-                                </button>
+                                {userId ? (
+                                    <button className="apply-button" onClick={handleApplyClick} disabled={hasApplied}>
+                                        {hasApplied ? 'Ya Aplicaste' : 'Aplicar'}
+                                    </button>
+                                ) : (
+                                    <button className="apply-button" onClick={handleLoginClick}>
+                                        Iniciar Sesión
+                                    </button>
+                                )}
                             </div>
                             {error && <div className="error-message">{error}</div>}
                         </div>
