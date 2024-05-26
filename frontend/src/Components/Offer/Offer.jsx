@@ -6,7 +6,8 @@ import axios from 'axios';
 import InputField from './InputField';
 import SelectField from './SelectField';
 import TextareaField from './TextareaField';
-import municipiosData from '../../file/municipios_boyaca_coordenadas.json';  
+import municipiosData from '../../file/municipios_boyaca_coordenadas.json';
+import { AlertComponent } from "../Alert/AlertComponent";
 
 const Offer = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const Offer = () => {
     workingDay: '',
     images: []
   });
+  const [alertInfo, setAlertInfo] = useState({ visible: false, color: '', title: '', description: '' });
 
   useEffect(() => {
     // Suponiendo que el usuario selecciona el primer municipio por defecto
@@ -89,7 +91,15 @@ const Offer = () => {
       navigate('/ConfirmOffer');
     } catch (error) {
       console.error('Error:', error);
-      alert('Error submitting the offer');
+      setAlertInfo({ visible: false });  
+      setTimeout(() => {
+        setAlertInfo({
+          visible: true,
+          color: 'error',
+          title: 'Error al enviar la oferta',
+          description: 'Intente de nuevo más tarde.'
+        });
+      }, 100); 
     }
   };
 
@@ -100,7 +110,8 @@ const Offer = () => {
         <div className="offer-wrapper">
           <form onSubmit={handleSubmit}>
             <h1>Formulario de Creación de Ofertas</h1>
-
+            <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
+              {alertInfo.visible && <AlertComponent color={alertInfo.color} title={alertInfo.title} description={alertInfo.description} />}            </div>
             <div className="input-box-image">
               <UploadComponent onFilesSelected={(files) => setFormData(prev => ({ ...prev, images: files }))} />
             </div>

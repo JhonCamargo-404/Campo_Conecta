@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from 'react-modal';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';
@@ -42,29 +43,8 @@ const ViewOffer = () => {
             }
         };
 
-        const fetchCv = async () => {
-            if (user) {
-                try {
-                    const response = await axios.get(`http://localhost:8000/get_cv/${user.id_user}`);
-                    if (response.data.cv) {
-                        setCv(response.data.cv);  // Si el CV existe, lo establece
-                    } else {
-                        setIsUploadModalOpen(true);  // Si no hay CV, abre el modal para subir uno
-                    }
-                } catch (error) {
-                    if (error.response && error.response.status === 404) {
-                        setIsUploadModalOpen(true); 
-                    } else {
-                        console.error('Error fetching CV:', error);
-                        setError('An unexpected error occurred while fetching your CV.');
-                    }
-                }
-            }
-        };
-
         fetchOfferDetails();
         fetchAppliedStatus();
-        fetchCv();
     }, [id, user]);
 
     const handleDateChange = (newValue) => {
@@ -92,16 +72,35 @@ const ViewOffer = () => {
         }
     };
 
-    const handleApplyClick = () => {
+    const handleApplyClick = async () => {
         if (!user) {
             navigate('/login'); // Redirigir al login si no hay userId
             return;
         }
+
         if (!cv) {  // Chequea si el CV no está cargado
-            setError('Por favor sube tu CV antes de aplicar.');
-            setIsUploadModalOpen(true);  // Abre el modal para cargar CV
-            return;  // Detiene la ejecución adicional hasta que el CV sea cargado
+            try {
+                const response = await axios.get(`http://localhost:8000/get_cv/${user.id_user}`);
+                if (response.data.cv) {
+                    setCv(response.data.cv);  // Si el CV existe, lo establece
+                    proceedToApply();  // Procede a aplicar si ya tiene CV
+                } else {
+                    setIsUploadModalOpen(true);  // Si no hay CV, abre el modal para subir uno
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    setIsUploadModalOpen(true);
+                } else {
+                    console.error('Error fetching CV:', error);
+                    setError('An unexpected error occurred while fetching your CV.');
+                }
+            }
+        } else {
+            proceedToApply();  // Si ya tiene un CV cargado, procede a aplicar directamente
         }
+    };
+
+    const proceedToApply = () => {
         if (dateRange[0] && dateRange[1]) {
             const checkInDate = dateRange[0].format('YYYY-MM-DD');
             const checkOutDate = dateRange[1].format('YYYY-MM-DD');
@@ -114,15 +113,17 @@ const ViewOffer = () => {
             axios.post('http://localhost:8000/submit-dates', data)
                 .then(response => {
                     navigate('/ApplicationConfirmed');
-                    setError('');  // Clear error on success
+                    setError('');  // Limpia el error en caso de éxito
                 })
                 .catch(error => {
                     console.error('Error sending dates:', error);
+                    setError('Please ensure you have selected both start and end dates.');
                 });
         } else {
             setError('Please select both start and end dates.');
         }
     };
+
 
     if (!offer) return <div>Loading...</div>;
 
@@ -135,6 +136,9 @@ const ViewOffer = () => {
                     <div className="info-offer">
                         <div className="view-offer-title">
                             <h1>{offer.name_offer}</h1>
+                        </div>
+                        <div className="view-offer-municipality">
+                            <h2><strong>Municipio:</strong>{offer.municipality}</h2>
                         </div>
                         <div className="view-offer-description">
                             <p>{offer.description}</p>

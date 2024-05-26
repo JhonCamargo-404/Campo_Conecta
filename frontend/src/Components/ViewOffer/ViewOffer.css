@@ -96,6 +96,10 @@
     margin-right: 10px;
 }
 
+.view-offer-municipality {
+    margin-bottom: 10px;  /* Ajusta este valor según necesites */
+}
+
 .body-blur {
     filter: blur(5px);
 }

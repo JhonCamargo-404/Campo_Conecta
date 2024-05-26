@@ -7,13 +7,14 @@ import { Link } from "react-router-dom";
 import Map from "../Map/Map";
 import municipalitiesData from "../../file/municipios_boyaca_coordenadas.json";
 
-const OfferCard = ({ id, title, description, start_day, image_url }) => {
+const OfferCard = ({ id, title, municipality, description, start_day, image_url }) => {
   return (
     <Link to={`/offer/${id}`} style={{ textDecoration: 'none' }}>
       <div className="w-full h-42 mx-auto bg-white rounded-lg shadow-md p-4 mb-4 flex items-center justify-start gap-4">
         <img src={image_url} alt="Offer" className="w-24 h-auto object-cover" />
         <div className="text-left flex flex-col justify-center">
-          <h3 className="my-2">{title}</h3>
+          <h3 className="my-2"><strong>{title}</strong></h3>
+          <h2 className="my-2" >{municipality}</h2>
           <p className="my-2">{description}</p>
           <span className="my-2">{start_day}</span>
         </div>
@@ -196,7 +197,7 @@ const OffersContainer = ({ filteredMunicipality, offers, setOffers }) => {
             key={offer.id_offer}
             id={offer.id_offer}
             title={offer.name_offer}
-            description={offer.description}
+            municipality={offer.municipality}
             start_day={offer.start_day}
             image_url={offer.image_url}
           />

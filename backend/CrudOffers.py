@@ -9,7 +9,7 @@ class OfferCRUD:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bryan',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -88,14 +88,14 @@ class OfferCRUD:
             self.connection.rollback()
         finally:
             cursor.close()
-
     def get_all_offers(self):
         with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
             sql = """
             SELECT 
                 o.id_offer, 
                 oi.name_offer, 
-                oi.start_day, 
+                oi.start_day,
+                oi.municipality, 
                 oi.description, 
                 oi.coordinates,
                 hu.id_host_user, 
@@ -105,7 +105,7 @@ class OfferCRUD:
             JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
             JOIN host_user hu ON o.id_host_user = hu.id_host_user
             LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
-            GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
+            GROUP BY o.id_offer
             """
             cursor.execute(sql)
             results = cursor.fetchall()
@@ -165,6 +165,7 @@ class OfferCRUD:
                     oi.start_day, 
                     oi.description, 
                     oi.coordinates,
+                    oi.municipality,
                     hu.id_host_user, 
                     lc.salary, 
                     lc.feeding,
