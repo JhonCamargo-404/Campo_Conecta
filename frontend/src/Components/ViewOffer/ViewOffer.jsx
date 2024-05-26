@@ -5,8 +5,8 @@ import axios from 'axios';
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';
-import { UploadComponent } from './UploadComponent';
 import { AuthContext } from '../../context/AuthContext';
+import { UploadComponent } from './UploadComponent';
 import "./ViewOffer.css";
 
 const ViewOffer = () => {
@@ -169,13 +169,6 @@ const ViewOffer = () => {
                         <strong>Día de inicio:</strong> {new Date(offer.start_day).toLocaleDateString()}
                     </div>
                 </div>
-                {user && (
-                    <div className="cv-upload-section">
-                        <h3>Subir CV</h3>
-                        <UploadComponent onFilesSelected={handleFilesSelected} />
-                        {cv && <p>CV Subido: {cv}</p>}
-                    </div>
-                )}
             </div>
             <Modal
                 isOpen={isUploadModalOpen}
@@ -187,7 +180,6 @@ const ViewOffer = () => {
                 <h2>Subir CV</h2>
                 <UploadComponent onFilesSelected={handleFilesSelected} />
                 <div className="upload-footer">
-                    <button className="upload-button" onClick={handleFilesSelected}>Enviar CV</button>
                     <button className="close-button" onClick={() => setIsUploadModalOpen(false)}>Cerrar</button>
                 </div>
             </Modal>
