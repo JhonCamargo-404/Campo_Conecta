@@ -22,7 +22,6 @@ const OfferCard = ({ id, title, description, start_day, image_url }) => {
   );
 };
 
-
 const MunicipalityFilter = ({ applyFilters, closeFilterMenu }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMunicipality, setSelectedMunicipality] = useState(null);
@@ -90,10 +89,11 @@ const MunicipalityFilter = ({ applyFilters, closeFilterMenu }) => {
   );
 };
 
-
-const OffersHeader = ({ applyFilters }) => {
+const OffersHeader = ({ applyFilters, offers }) => {
   const [showMap, setShowMap] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [predictedOffers, setPredictedOffers] = useState([]);
 
   const toggleFilterMenu = () => {
     setShowFilterMenu(!showFilterMenu);
@@ -103,6 +103,20 @@ const OffersHeader = ({ applyFilters }) => {
     setShowFilterMenu(false);
   };
 
+  const handleSearchChange = (event) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+
+    if (term.length > 0) {
+      const predictions = offers.filter(offer =>
+        offer.name_offer.toLowerCase().includes(term.toLowerCase())
+      );
+      setPredictedOffers(predictions);
+    } else {
+      setPredictedOffers([]);
+    }
+  };
+
   return (
     <div className="h-30 w-4/5 mx-auto mt-8 relative">
       <div className="flex justify-around items-center w-full">
@@ -110,11 +124,24 @@ const OffersHeader = ({ applyFilters }) => {
           <MdOutlineMyLocation className="text-xl mr-2" />
           Tunja, Boyacá
         </button>
-        <input
-          type="text"
-          placeholder="Buscar ofertas"
-          className="flex-grow p-2.5 text-lg border-2 border-black rounded-lg outline-none mr-2.5 text-gray-800 placeholder-gray-400 focus:border-green-400"
-        />
+        <div className="relative flex-grow mr-2.5">
+          <input
+            type="text"
+            placeholder="Buscar ofertas"
+            className="w-full p-2.5 text-lg border-2 border-black rounded-lg outline-none text-gray-800 placeholder-gray-400 focus:border-green-400"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {predictedOffers.length > 0 && (
+            <div className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+              {predictedOffers.map(offer => (
+                <Link to={`/offer/${offer.id_offer}`} key={offer.id_offer} className="block px-4 py-2 hover:bg-gray-100">
+                  {offer.name_offer}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="relative">
           <BsFillFilterSquareFill className="text-xl cursor-pointer" onClick={toggleFilterMenu} />
           {showFilterMenu && (
@@ -127,8 +154,8 @@ const OffersHeader = ({ applyFilters }) => {
     </div>
   );
 };
-const OffersContainer = ({ filteredMunicipality }) => {
-  const [offers, setOffers] = useState([]);
+
+const OffersContainer = ({ filteredMunicipality, offers, setOffers }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -157,7 +184,7 @@ const OffersContainer = ({ filteredMunicipality }) => {
     };
 
     fetchOffers();
-  }, [filteredMunicipality]);
+  }, [filteredMunicipality, setOffers]);
 
   return (
     <div className="flex flex-col justify-center gap-5 p-4 w-4/5 mx-auto">
@@ -183,8 +210,10 @@ const OffersContainer = ({ filteredMunicipality }) => {
     </div>
   );
 };
+
 const Home = () => {
   const [filteredMunicipality, setFilteredMunicipality] = useState(null);
+  const [offers, setOffers] = useState([]);
 
   const applyMunicipalityFilters = (municipality) => {
     setFilteredMunicipality(municipality);
@@ -194,13 +223,12 @@ const Home = () => {
     <div className="flex flex-col w-screen min-h-screen bg-gradient-to-b from-custom-green1 via-custom-green2 to-custom-green4 justify-between">
       <NavBar />
       <div className="flex-grow">
-        <OffersHeader applyFilters={applyMunicipalityFilters} />
-        <OffersContainer filteredMunicipality={filteredMunicipality} />
+        <OffersHeader applyFilters={applyMunicipalityFilters} offers={offers} />
+        <OffersContainer filteredMunicipality={filteredMunicipality} offers={offers} setOffers={setOffers} />
       </div>
       <Footer />
     </div>
   );
 };
-
 
 export default Home;
