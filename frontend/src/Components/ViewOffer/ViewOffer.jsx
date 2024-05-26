@@ -1,26 +1,28 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';  
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';
 import { UploadComponent } from './UploadComponent';
-import { AuthContext } from "../../context/AuthContext";  // Importa AuthContext
 
 import "./ViewOffer.css";
 
 const ViewOffer = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const { user, logout } = useContext(AuthContext);  // Usa el contexto de autenticación
     const [offer, setOffer] = useState(null);
+    const token = sessionStorage.getItem('token');
+    const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
     const [dateRange, setDateRange] = useState([null, null]);
     const [error, setError] = useState('');
     const [hasApplied, setHasApplied] = useState(false);
     const [cv, setCv] = useState('');
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const [files, setFiles] = useState([]);
+    const [files, setFiles] = useState([]);  // Estado para manejar los archivos
 
     useEffect(() => {
         const fetchOfferDetails = async () => {
@@ -30,33 +32,25 @@ const ViewOffer = () => {
         };
 
         const fetchAppliedStatus = async () => {
-            if (user) {
-                try {
-                    const response = await axios.get(`http://localhost:8000/has_applied/${user.id}/${id}`);
-                    setHasApplied(response.data.has_applied);
-                } catch (error) {
-                    console.error('Error fetching applied status:', error);
-                    if (error.response) {
-                        console.error('Response data:', error.response.data);
-                        console.error('Response status:', error.response.status);
-                    }
-                }
+            if (userId) {
+                const response = await axios.get(`http://localhost:8000/has_applied/${userId}/${id}`);
+                setHasApplied(response.data.has_applied);
             }
         };
 
         const fetchCv = async () => {
             try {
-                if (user) {
-                    const response = await axios.get(`http://localhost:8000/get_cv/${user.id}`);
+                if (userId) {
+                    const response = await axios.get(`http://localhost:8000/get_cv/${userId}`);
                     if (response.data.cv) {
-                        setCv(response.data.cv);
+                        setCv(response.data.cv);  // Si el CV existe, lo establece
                     } else {
-                        setIsUploadModalOpen(true);
+                        setIsUploadModalOpen(true);  // Si no hay CV, abre el modal para subir uno
                     }
                 }
             } catch (error) {
                 if (error.response && error.response.status === 404) {
-                    setIsUploadModalOpen(true);
+                    setIsUploadModalOpen(true); 
                 } else {
                     console.error('Error fetching CV:', error);
                     setError('An unexpected error occurred while fetching your CV.');
@@ -67,7 +61,7 @@ const ViewOffer = () => {
         fetchOfferDetails();
         fetchAppliedStatus();
         fetchCv();
-    }, [id, user]);
+    }, [id, userId]);
 
     const handleDateChange = (newValue) => {
         setDateRange(newValue);
@@ -76,7 +70,7 @@ const ViewOffer = () => {
     const handleFilesSelected = (selectedFiles) => {
         setFiles(selectedFiles);
         if (selectedFiles.length > 0) {
-            uploadFile(selectedFiles[0]);
+            uploadFile(selectedFiles[0]);  // Sube el primer archivo seleccionado
         }
     };
 
@@ -84,8 +78,8 @@ const ViewOffer = () => {
         const formData = new FormData();
         formData.append('file', file);
         try {
-            const response = await axios.post(`http://localhost:8000/upload_cv/${user.id}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            const response = await axios.post(`http://localhost:8000/upload_cv/${userId}`, formData, {
+                headers: {'Content-Type': 'multipart/form-data'}
             });
             setCv(file.name);
             setIsUploadModalOpen(false);
@@ -95,9 +89,9 @@ const ViewOffer = () => {
     };
 
     const handleApplyClick = () => {
-        if (!cv) {
-            setIsUploadModalOpen(true);
-            return;
+        if (!cv) {  // Chequea si el CV no está cargado
+            setIsUploadModalOpen(true);  // Abre el modal para cargar CV
+            return;  // Detiene la ejecución adicional hasta que el CV sea cargado
         }
         if (dateRange[0] && dateRange[1]) {
             const checkInDate = dateRange[0].format('YYYY-MM-DD');
@@ -105,13 +99,13 @@ const ViewOffer = () => {
             const data = {
                 startDate: checkInDate,
                 endDate: checkOutDate,
-                id_user: user.id,
+                id_user: userId,
                 id_offer: id
             };
             axios.post('http://localhost:8000/submit-dates', data)
                 .then(response => {
                     navigate('/ApplicationConfirmed');
-                    setError('');
+                    setError('');  // Clear error on success
                 })
                 .catch(error => {
                     console.error('Error sending dates:', error);
@@ -145,7 +139,7 @@ const ViewOffer = () => {
                                 onChange={handleDateChange}
                             />
                             <div className="apply-button-container">
-                                {user ? (
+                                {userId ? (
                                     <button className="apply-button" onClick={handleApplyClick} disabled={hasApplied}>
                                         {hasApplied ? 'Ya Aplicaste' : 'Aplicar'}
                                     </button>
@@ -175,8 +169,8 @@ const ViewOffer = () => {
                 isOpen={isUploadModalOpen}
                 onRequestClose={() => setIsUploadModalOpen(false)}
                 contentLabel="Upload CV"
-                className="ReactModal__Content"
-                overlayClassName="ReactModal__Overlay"
+                className="ReactModal__Content" // Clase para el contenido
+                overlayClassName="ReactModal__Overlay" // Clase para el overlay
             >
                 <h2>Subir CV</h2>
                 <UploadComponent onFilesSelected={handleFilesSelected} />
