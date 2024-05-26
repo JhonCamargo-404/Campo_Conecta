@@ -312,6 +312,43 @@ class OfferCRUD:
             print(f"Error adding application: {e}")
             self.connection.rollback()
             return False
+    def get_offers_by_municipality(self, municipality):
+        try:
+            with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
+                sql = """
+                SELECT
+                    o.id_offer,
+                    oi.name_offer,
+                    oi.start_day,
+                    oi.description,
+                    oi.coordinates,
+                    hu.id_host_user,
+                    MIN(im.image_path) AS image_path
+                FROM offer o
+                JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+                JOIN host_user hu ON o.id_host_user = hu.id_host_user
+                LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
+                WHERE oi.municipality = %s
+                GROUP BY o.id_offer
+                """
+                print(f"Executing SQL: {sql} with municipality: {municipality}")
+                cursor.execute(sql, municipality)
+                results = cursor.fetchall()
+                print(f"Results fetched: {results}")
+
+                for offer in results:
+                    if offer['start_day'] and isinstance(offer['start_day'], datetime.date):
+                        offer['start_day'] = offer['start_day'].strftime('%Y-%m-%d')
+                    if offer['image_path']:
+                        cleaned_path = offer['image_path'].replace('../backend/offer_images/', '')
+                        offer['image_url'] = f"http://localhost:8000/{cleaned_path}"
+                    else:
+                        offer['image_url'] = None
+
+                return results
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return []
 
     def __del__(self):
         self.connection.close()

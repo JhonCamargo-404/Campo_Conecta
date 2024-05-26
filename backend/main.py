@@ -1,6 +1,7 @@
 import json
 import logging
 import shutil
+from urllib import request
 import uuid
 from datetime import date, timedelta, datetime
 from typing import Optional, List
@@ -460,3 +461,20 @@ async def reset_password(reset_data: PasswordReset):
         return {"message": "Password updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/get_offers-by-municipality/{municipality}")
+async def get_offers_by_municipality(municipality: str):
+    try:
+        if municipality.lower() == "todos":
+            offers = offer_crud.get_all_offers()
+        else:
+            offers = offer_crud.get_offers_by_municipality(municipality)
+        if not offers:
+            raise HTTPException(status_code=404, detail=f"No offers found for municipality: {municipality}")
+        return offers
+    except Exception as e:
+        logging.error(f"Failed to fetch offers for municipality {municipality}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
