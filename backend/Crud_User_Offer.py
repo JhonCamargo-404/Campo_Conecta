@@ -8,7 +8,7 @@ class CrudUserOffer:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='root',
+            password='bryan',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
