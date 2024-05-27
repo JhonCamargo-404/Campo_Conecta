@@ -154,9 +154,11 @@ async def login_user(user_data: UserLogin):
         if token:
             return {"access_token": token, "token_type": "bearer"}
         else:
-            raise HTTPException(status_code=400, detail="Invalid email or password")
+            # Mensaje de error específico para contraseña incorrecta
+            raise HTTPException(status_code=400, detail="Contraseña incorrecta")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 # Endpoint protegido de ejemplo

@@ -100,10 +100,11 @@ class UserCRUD:
                     if user_result:
                         user_id = user_result['id_user']
                         return self.create_jwt(email, user_id, rol)
-                return None
+                else:
+                    # Retorna None si la contraseña es incorrecta
+                    return None
             else:
                 return None
-
     def create_jwt(self, email, id_user, rol):
         payload = {
             "email": email,

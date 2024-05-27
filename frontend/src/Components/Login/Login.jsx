@@ -3,16 +3,38 @@ import "./Login.css";
 import { FaUser, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import ValidationComponent from "./Validation_Component/ValidationComponent"; // Asegúrate de ajustar la ruta según tu estructura de proyecto
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const { setUser } = useContext(AuthContext);
+  const [validationMessage, setValidationMessage] = useState("");
+  const [showValidation, setShowValidation] = useState(false);
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    const isValidEmail = /\S+@\S+\.\S+/.test(value);
+    setErrors({ ...errors, email: isValidEmail ? "" : "Correo electrónico no válido" });
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setErrors({ ...errors, password: "" });
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (errors.email) {
+      setValidationMessage("Por favor, corrija los errores en el formulario.");
+      setShowValidation(true);
+      return;
+    }
     try {
       const response = await fetch("http://127.0.0.1:8000/login/", {
         method: "POST",
@@ -25,9 +47,11 @@ const Login = () => {
       if (response.ok) {
         const data = await response.json();
         sessionStorage.setItem("token", data.access_token);
-        localStorage.setItem("token", data.access_token);    
+        localStorage.setItem("token", data.access_token);
         const decoded = jwtDecode(data.access_token);
         setUser(decoded);
+        setValidationMessage("Login successful!");
+        setShowValidation(true);
         if (decoded.rol === 'A') {
           navigate("/HomeAdmin", { state: { isLoggedIn: true } });
         } else if (decoded.rol === 'U') {
@@ -35,11 +59,18 @@ const Login = () => {
         }
       } else {
         const data = await response.json();
-        console.log(data);
+        setValidationMessage(`Error: ${data.message || "Login failed"}`);
+        setShowValidation(true);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      setValidationMessage(`Error: ${error.message}`);
+      setShowValidation(true);
     }
+  };
+
+  const handleCloseValidation = () => {
+    setShowValidation(false);
+    setValidationMessage("");
   };
 
   return (
@@ -52,17 +83,18 @@ const Login = () => {
               type="text"
               placeholder="Usuario"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
               required
             />
             <FaUser className="icon" />
+            {errors.email && <p className="error-message">{errors.email}</p>}
           </div>
           <div className="input-box">
             <input
               type="password"
               placeholder="Contraseña"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
               required
             />
             <FaLock className="icon" />
@@ -86,6 +118,12 @@ const Login = () => {
       <div className="image-wrapper-login">
         <div className="image-login"></div>
       </div>
+      {showValidation && (
+        <ValidationComponent
+          message={validationMessage}
+          onClose={handleCloseValidation}
+        />
+      )}
     </div>
   );
 };
