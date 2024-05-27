@@ -42,7 +42,7 @@ const EditOffer = () => {
           feeding: offer.feeding,
           workingHours: offer.workingHours,
           workingDay: offer.workingDay,
-          images: offer.image_paths ? offer.image_paths.split(',').map(path => `http://localhost:8000${path}`) : [],
+          images: offer.image_urls,
           deletedImages: []
         });
       } catch (error) {
