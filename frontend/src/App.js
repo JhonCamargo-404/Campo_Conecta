@@ -14,6 +14,7 @@ import ConfirmOffer from './Components/ConfirmOffer/ConfirmOffer';
 import ApplicationConfirmed from './Components/ApplicationConfirmed/ApplicationConfirmed';
 import Calendar from './Components/Calendar/Calendar';
 import ViewOffer from './Components/ViewOffer/ViewOffer';
+import EditOffer from './Components/Offer/EditOffer';
 import ForgotPassword from './Components/ForgotPassword/ForgotPassword';
 import NewPassword from './Components/NewPassword/NewPassword';
 import MyProfile from './Components/Configuration/Admin1/MyProfile';
@@ -58,6 +59,7 @@ function App() {
         <Route path="/DeleteUsers" element={<DeleteUsers />} />
         <Route path="/DeleteMyAdvertisement" element={<DeleteMyAdvertisement />} />
         <Route path="/HomeAdmin" element={<HomeAdmin />} />
+        <Route path="/EditOffer/:offerId" element={<EditOffer />} />
       </Routes>
     </div>
   );

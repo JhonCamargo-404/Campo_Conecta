@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Applicants from './Applicants';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import { jwtDecode } from 'jwt-decode';  
 
 const Advertisements = () => {
@@ -8,6 +9,7 @@ const Advertisements = () => {
   const [selectedOfferId, setSelectedOfferId] = useState(null);
   const token = sessionStorage.getItem('token');
   const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
+  const navigate = useNavigate(); // Crear instancia de useNavigate
 
   useEffect(() => {
     const fetchPostulaciones = async () => {
@@ -20,7 +22,7 @@ const Advertisements = () => {
     };
 
     fetchPostulaciones();
-  }, []);
+  }, [userId]);
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta oferta?");
@@ -49,7 +51,7 @@ const Advertisements = () => {
         {postulaciones.map((postulacion, index) => (
           <div 
             key={index} 
-            className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer" 
+            className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer"
             onClick={() => openModal(postulacion.id_offer)}
           >
             <div className="flex items-center justify-between">
@@ -63,7 +65,12 @@ const Advertisements = () => {
               </div>
             </div>
             <div className="flex justify-end mt-4 space-x-3">
-              <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/EditOffer/${postulacion.id_offer}`); // Redirigir a la ruta de edición
+                }} 
+                className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
                 Editar
               </button>
               <button 

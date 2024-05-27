@@ -26,8 +26,8 @@ export const UploadComponent = ({ onFilesSelected }) => {
                     <img src={folderIcon} alt="folder" />
                 </Upload.Icon>
                 <Upload.Text>
-                    <p>Drag & Drop or Choose a PDF file to Upload</p>
-                    <p>Only PDF format allowed, up to 50 MB.</p>
+                    <p>Arrastrar y suelta un archivo para añadirlos</p>
+                    <p>Solo se permite formato PDF, tamaño máximo 50 MB.</p>
                 </Upload.Text>
             </Upload.Body>
             <Upload.Footer isFileExists={files.length > 0}>

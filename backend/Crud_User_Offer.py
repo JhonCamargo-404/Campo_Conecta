@@ -20,16 +20,16 @@ class CrudUserOffer:
                 SELECT 
                     a.id_applicant,
                     u.id_user,
-                    ic.email,
+                    uc.email,
                     iu.user_name,
                     iu.user_last_name,
                     iu.age,
                     iu.cv
                 FROM offer_applicant oa
-                JOIN applicant a ON oa.id_applicant = a.id_applicant
-                JOIN users u ON a.id_user = u.id_user
-                JOIN user_Credentials ic ON u.id_user_credentials = ic.id_User_Credentials
-                JOIN info_User iu ON u.id_info_user = iu.id_info_user
+                LEFT JOIN applicant a ON oa.id_applicant = a.id_applicant
+                LEFT JOIN users u ON a.id_user = u.id_user
+                LEFT JOIN user_credentials uc ON u.id_user = uc.id_user_credentials
+                LEFT JOIN info_user iu ON u.id_user = iu.id_info_user
                 WHERE oa.id_offer = %s
                 """
                 cursor.execute(sql, (id_offer,))
@@ -80,7 +80,7 @@ class CrudUserOffer:
                             MIN(io.image_path) AS image_path  
                         FROM offer_applicant oa
                         JOIN offer o ON oa.id_offer = o.id_offer
-                        JOIN offer_info oi ON o.id_offer_info = oi.id_offer_info
+                        JOIN offer_info oi ON o.id_offer = oi.id_offer_info
                         LEFT JOIN image_offer io ON oi.id_offer_info = io.id_offer_info  
                         WHERE oa.id_applicant IN (
                             SELECT id_applicant FROM applicant WHERE id_user=%s
@@ -118,3 +118,6 @@ class CrudUserOffer:
             print(f"Database error: {e}")
             self.connection.rollback()
             raise HTTPException(status_code=500, detail="Failed to update applicant status")
+
+    def __del__(self):
+        self.connection.close()

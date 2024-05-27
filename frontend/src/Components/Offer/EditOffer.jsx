@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { UploadComponent } from './UploadComponent';
+import { useNavigate, useParams } from "react-router-dom";
+import { UploadComponent } from '../ViewOffer/UploadComponent';
 import NavBar from "../NavBar/NavBar";
 import axios from 'axios';
 import InputField from './InputField';
@@ -9,8 +9,9 @@ import TextareaField from './TextareaField';
 import municipiosData from '../../file/municipios_boyaca_coordenadas.json';
 import { AlertComponent } from "../Alert/AlertComponent";
 
-const Offer = () => {
+const EditOffer = () => {
   const navigate = useNavigate();
+  const { offerId } = useParams();
   const [formData, setFormData] = useState({
     name_offer: '',
     start_day: '',
@@ -21,21 +22,44 @@ const Offer = () => {
     feeding: '',
     workingHours: 0,
     workingDay: '',
-    images: []
+    images: [],
+    deletedImages: []
   });
   const [alertInfo, setAlertInfo] = useState({ visible: false, color: '', title: '', description: '' });
 
   useEffect(() => {
-    // Suponiendo que el usuario selecciona el primer municipio por defecto
-    if (municipiosData.length > 0) {
-      const { Municipio, Latitud, Longitud } = municipiosData[0];
-      setFormData(prev => ({
-        ...prev,
-        municipality: Municipio,
-        coordinates: `${Latitud}, ${Longitud}`
-      }));
+    const fetchOffer = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/get_offer/${offerId}`);
+        const offer = response.data;
+        setFormData({
+          name_offer: offer.name_offer,
+          start_day: offer.start_day,
+          description: offer.description,
+          municipality: offer.municipality,
+          coordinates: offer.coordinates,
+          salary: offer.salary,
+          feeding: offer.feeding,
+          workingHours: offer.workingHours,
+          workingDay: offer.workingDay,
+          images: offer.image_paths ? offer.image_paths.split(',').map(path => `http://localhost:8000${path}`) : [],
+          deletedImages: []
+        });
+      } catch (error) {
+        console.error('Error fetching offer:', error);
+        setAlertInfo({
+          visible: true,
+          color: 'error',
+          title: 'Error al cargar la oferta',
+          description: 'Intente de nuevo más tarde.'
+        });
+      }
+    };
+
+    if (offerId) {
+      fetchOffer();
     }
-  }, []);
+  }, [offerId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,6 +75,21 @@ const Offer = () => {
         }));
       }
     }
+  };
+
+  const handleImageRemove = (image) => {
+    setFormData(prevState => ({
+      ...prevState,
+      images: prevState.images.filter(img => img !== image),
+      deletedImages: [...prevState.deletedImages, image]
+    }));
+  };
+
+  const handleFilesSelected = (files) => {
+    setFormData(prevState => ({
+      ...prevState,
+      images: [...prevState.images, ...files]
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -79,27 +118,28 @@ const Offer = () => {
       coordinates: formData.coordinates
     }));
 
-    if (formData.images && formData.images.length > 0) {
-      formData.images.forEach((image, i) => {
-        data.append(`images`, image);
-      });
+    formData.images.forEach((image, i) => {
+      if (typeof image === 'object') {
+        data.append(`new_images`, image);
+      }
+    });
+
+    if (formData.deletedImages.length > 0) {
+      data.append('deleted_images', JSON.stringify(formData.deletedImages));
     }
 
     try {
-      const response = await axios.post('http://localhost:8000/add_offer/', data, config);
+      const response = await axios.put(`http://localhost:8000/updateOffer/${offerId}`, data, config);
       console.log('Success:', response);
       navigate('/ConfirmOffer');
     } catch (error) {
       console.error('Error:', error);
-      setAlertInfo({ visible: false });  
-      setTimeout(() => {
-        setAlertInfo({
-          visible: true,
-          color: 'error',
-          title: 'Error al enviar la oferta',
-          description: 'Intente de nuevo más tarde.'
-        });
-      }, 100); 
+      setAlertInfo({
+        visible: true,
+        color: 'error',
+        title: 'Error al actualizar la oferta',
+        description: 'Intente de nuevo más tarde.'
+      });
     }
   };
 
@@ -109,11 +149,18 @@ const Offer = () => {
       <div className="offer-container">
         <div className="offer-wrapper">
           <form onSubmit={handleSubmit}>
-            <h1>Formulario de Creación de Ofertas</h1>
-            <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
-              {alertInfo.visible && <AlertComponent color={alertInfo.color} title={alertInfo.title} description={alertInfo.description} />}            </div>
+            <h1>Formulario de Actualización de Ofertas</h1>
+            {alertInfo.visible && (
+              <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
+                <AlertComponent color={alertInfo.color} title={alertInfo.title} description={alertInfo.description} />
+              </div>
+            )}
             <div className="input-box-image">
-              <UploadComponent onFilesSelected={(files) => setFormData(prev => ({ ...prev, images: files }))} />
+              <UploadComponent 
+                initialImages={formData.images}
+                onFilesSelected={handleFilesSelected}
+                onImageRemove={handleImageRemove}
+              />
             </div>
 
             <div className="todo">
@@ -195,7 +242,8 @@ const Offer = () => {
 
             </div>
             <div className="button-container">
-              <button type="submit" className="create-offer-button">Crear oferta</button>
+              <button type="submit" className="create-offer-button">Actualizar oferta</button>
+              <button type="button" onClick={() => navigate(-1)} className="cancel-button">Cancelar</button>
             </div>
           </form>
         </div>
@@ -204,4 +252,4 @@ const Offer = () => {
   );
 };
 
-export default Offer;
+export default EditOffer;
