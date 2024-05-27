@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Modal from 'react-modal';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import NavBar from "../NavBar/NavBar";
 import ImageCarousel from "./ImageCarousel";
 import BasicDateRangePicker from './BasicDateRangePicker';

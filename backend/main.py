@@ -40,7 +40,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "DELETE"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -83,6 +83,13 @@ class DateRange(BaseModel):
     endDate: date
     id_user: int
     id_offer: int
+
+
+class ProfileUpdateRequest(BaseModel):
+    firstName: str
+    lastName: str
+    age: int
+    email: str
 
 
 def get_user_id(token: str):
@@ -340,11 +347,15 @@ async def accept_applicant(id_applicant: int):
 async def reject_applicant(id_applicant: int):
     return crud_user_offer.update_applicant_status(id_applicant, "rechazado")
 
+
 class PasswordReset(BaseModel):
     email: EmailStr
     new_password: str
+
+
 class PasswordResetRequest(BaseModel):
     email: EmailStr
+
 
 @app.post("/forgot-password/")
 async def forgot_password(request: PasswordResetRequest):
@@ -426,11 +437,12 @@ async def forgot_password(request: PasswordResetRequest):
 
     # Enviar el correo electrónico utilizando la función de mailsender
     resultado = enviar_correo(email, asunto, contenido_html)
-    
+
     if resultado['status_code'] is None:
         raise HTTPException(status_code=500, detail=f"Error al enviar el correo: {resultado['error']}")
-    
+
     return {"message": "Correo de recuperación enviado"}
+
 
 @app.post("/reset-password/")
 async def reset_password(reset_data: PasswordReset):
@@ -440,10 +452,11 @@ async def reset_password(reset_data: PasswordReset):
 
         # Llama al método update_password del CRUD de usuario
         user_crud.update_password(email, new_password)
-        
+
         return {"message": "Password updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/get_offers-by-municipality/{municipality}")
 async def get_offers_by_municipality(municipality: str):
@@ -460,4 +473,10 @@ async def get_offers_by_municipality(municipality: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
+@app.put("/updateProfile/{user_id}")
+async def update_profile(user_id: int, request: ProfileUpdateRequest):
+    result = user_crud.update_user_info(user_id, request.firstName, request.lastName, request.age, request.email)
+    if result["success"]:
+        return {"success": True, "message": "Perfil actualizado con éxito"}
+    else:
+        raise HTTPException(status_code=400, detail=result["message"])

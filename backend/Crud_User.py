@@ -203,5 +203,31 @@ class UserCRUD:
             print(f"An error occurred: {e}")
             return False
 
+    def update_user_info(self, user_id, first_name, last_name, age, email):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                UPDATE info_user 
+                SET user_name = %s, user_last_name = %s, age = %s 
+                WHERE id_info_user = %s
+                """
+                cursor.execute(sql, (first_name, last_name, age, user_id))
+
+                sql = """
+                UPDATE user_credentials
+                SET email = %s
+                WHERE id_user_credentials = %s
+                """
+                cursor.execute(sql, (email, user_id))
+
+                self.connection.commit()
+
+                return {"success": True, "message": "Perfil actualizado con éxito"}
+        except Exception as e:
+            self.connection.rollback()
+            return {"success": False, "message": str(e)}
+        finally:
+            self.connection.close()
+
     def __del__(self):
         self.connection.close()

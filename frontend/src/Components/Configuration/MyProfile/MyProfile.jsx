@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import './MyProfile.css'; 
 import NavBar from "../../NavBar/NavBar";
 import SideMenu from "../SideMenu/SideMenu";
+import axios from 'axios';
+import { AuthContext } from '../../../context/AuthContext';
 
-// Componente para los campos del formulario
 const InputField = ({ label, type, name, value, onChange }) => (
   <div className="input-group">
     <label htmlFor={name}>{label}</label>
@@ -19,10 +20,11 @@ const InputField = ({ label, type, name, value, onChange }) => (
 );
 
 const UserProfile = () => {
+  const { user } = useContext(AuthContext); 
   const [profile, setProfile] = useState({
     firstName: '',
     lastName: '',
-    phoneNumber: '',
+    age: '',
     email: '',
   });
 
@@ -31,16 +33,31 @@ const UserProfile = () => {
     setProfile({ ...profile, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica para manejar la actualización del perfil
+    try {
+      const response = await axios.put(`http://127.0.0.1:8000/updateProfile/${user.id_user}`, profile, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.data.success) {
+        alert('Perfil actualizado con éxito');
+      } else {
+        alert('Error al actualizar el perfil: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      alert('Error al actualizar el perfil');
+    }
   };
 
   const handleReset = () => {
     setProfile({
       firstName: '',
       lastName: '',
-      phoneNumber: '',
+      age: '',
       email: '',
     });
   };
@@ -74,10 +91,10 @@ const UserProfile = () => {
 
               <div className="form-row">
                 <InputField
-                  label="Número"
-                  type="tel"
-                  name="phoneNumber"
-                  value={profile.phoneNumber}
+                  label="Edad"
+                  type="number"
+                  name="age"
+                  value={profile.age}
                   onChange={handleChange}
                 />
                 <InputField
