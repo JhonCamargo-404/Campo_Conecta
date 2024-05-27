@@ -11,7 +11,7 @@ class UserCRUD:
         self.connection = pymysql.connect(
             host='localhost',
             user='root',
-            password='bryan',
+            password='root',
             database='campo_conectabd',
             cursorclass=pymysql.cursors.DictCursor
         )
