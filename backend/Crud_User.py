@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 SECRET_KEY = 'your_secret_key'
 
+
 class UserCRUD:
     def __init__(self, db_url):
         self.connection = pymysql.connect(
@@ -26,19 +27,18 @@ class UserCRUD:
 
         try:
             with self.connection.cursor() as cursor:
-                # Insertar en Info_User
-                sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (user_name, user_last_name, age))
-                info_user_id = cursor.lastrowid  # ID generado para Info_User
-
-                # Insertar en User_Credentials
-                sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (hashed_password, email, 'U'))
-                user_credentials_id = cursor.lastrowid  # ID generado para User_Credentials
-
                 # Insertar en users
-                sql = "INSERT INTO users (id_user_credentials, id_info_user) VALUES (%s, %s)"
-                cursor.execute(sql, (user_credentials_id, info_user_id))
+                sql = "INSERT INTO users (id_user) VALUES (NULL)"
+                cursor.execute(sql)
+                user_id = cursor.lastrowid  # ID generado para users
+
+                # Insertar en info_user
+                sql = "INSERT INTO info_user (id_info_user, user_name, user_last_name, age) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, user_name, user_last_name, age))
+
+                # Insertar en user_credentials
+                sql = "INSERT INTO user_credentials (id_user_credentials, user_password, email, rol) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, hashed_password, email, 'U'))
 
             self.connection.commit()  # Confirmar todos los cambios si todo es correcto
             return {"success": True, "message": "Usuario registrado con éxito"}
@@ -57,19 +57,18 @@ class UserCRUD:
 
         try:
             with self.connection.cursor() as cursor:
-                # Insertar en Info_User
-                sql = "INSERT INTO Info_User (user_name, user_last_name, age) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (user_name, user_last_name, age))
-                info_user_id = cursor.lastrowid  # ID generado para Info_User
-
-                # Insertar en User_Credentials
-                sql = "INSERT INTO User_Credentials (user_password, email, rol) VALUES (%s, %s, %s)"
-                cursor.execute(sql, (hashed_password, email, 'A'))
-                user_credentials_id = cursor.lastrowid  # ID generado para User_Credentials
-
                 # Insertar en users
-                sql = "INSERT INTO users (id_user_credentials, id_info_user) VALUES (%s, %s)"
-                cursor.execute(sql, (user_credentials_id, info_user_id))
+                sql = "INSERT INTO users (id_user) VALUES (NULL)"
+                cursor.execute(sql)
+                user_id = cursor.lastrowid  # ID generado para users
+
+                # Insertar en info_user
+                sql = "INSERT INTO info_user (id_info_user, user_name, user_last_name, age) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, user_name, user_last_name, age))
+
+                # Insertar en user_credentials
+                sql = "INSERT INTO user_credentials (id_user_credentials, user_password, email, rol) VALUES (%s, %s, %s, %s)"
+                cursor.execute(sql, (user_id, hashed_password, email, 'A'))
 
             self.connection.commit()  # Confirmar todos los cambios si todo es correcto
             return {"success": True, "message": "Usuario registrado con éxito"}
@@ -79,23 +78,23 @@ class UserCRUD:
 
     def check_email_exists(self, email):
         with self.connection.cursor() as cursor:
-            sql = "SELECT COUNT(*) AS count FROM User_Credentials WHERE email = %s"
+            sql = "SELECT COUNT(*) AS count FROM user_credentials WHERE email = %s"
             cursor.execute(sql, (email,))
             result = cursor.fetchone()
             return result['count'] > 0
 
     def login(self, email, password):
         with self.connection.cursor() as cursor:
-            sql = "SELECT id_User_Credentials, user_password, rol FROM User_Credentials WHERE email = %s"
+            sql = "SELECT id_user_credentials, user_password, rol FROM user_credentials WHERE email = %s"
             cursor.execute(sql, (email,))
             result = cursor.fetchone()
             if result:
-                user_credentials_id = result['id_User_Credentials']
+                user_credentials_id = result['id_user_credentials']
                 hashed_password = result['user_password']
                 rol = result['rol']
                 hashed_password_utf8 = hashed_password.encode('utf-8')
                 if bcrypt.checkpw(password.encode('utf-8'), hashed_password_utf8):
-                    sql = "SELECT id_user FROM users WHERE id_user_credentials = %s"
+                    sql = "SELECT id_user FROM users WHERE id_user = %s"
                     cursor.execute(sql, (user_credentials_id,))
                     user_result = cursor.fetchone()
                     if user_result:
@@ -119,17 +118,16 @@ class UserCRUD:
         hashed_new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
 
         with self.connection.cursor() as cursor:
-            sql = "UPDATE User_Credentials SET user_password = %s WHERE email = %s"
+            sql = "UPDATE user_credentials SET user_password = %s WHERE email = %s"
             cursor.execute(sql, (hashed_new_password, email))
 
         self.connection.commit()
         print("Contraseña actualizada con éxito.")
-        
-        
+
     def get_cv(self, user_id):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT cv FROM info_User WHERE id_info_user=%s"
+                sql = "SELECT cv FROM info_user WHERE id_info_user=%s"
                 cursor.execute(sql, (user_id,))
                 result = cursor.fetchone()
                 if result and result['cv']:
@@ -144,7 +142,7 @@ class UserCRUD:
     def update_cv_path(self, user_id, cv_path):
         try:
             with self.connection.cursor() as cursor:
-                sql = "UPDATE info_User SET cv=%s WHERE id_info_user=%s"
+                sql = "UPDATE info_user SET cv=%s WHERE id_info_user=%s"
                 cursor.execute(sql, (cv_path, user_id))
                 self.connection.commit()
                 return True
@@ -157,14 +155,14 @@ class UserCRUD:
         try:
             with self.connection.cursor() as cursor:
                 # Consulta para obtener el id_user_credentials basado en el email
-                sql = "SELECT id_User_Credentials FROM User_Credentials WHERE email = %s"
+                sql = "SELECT id_user_credentials FROM user_credentials WHERE email = %s"
                 cursor.execute(sql, (email,))
                 result = cursor.fetchone()
                 if result:
-                    user_credentials_id = result['id_User_Credentials']
+                    user_credentials_id = result['id_user_credentials']
 
                     # Consulta para obtener el id_user usando id_user_credentials
-                    sql = "SELECT id_user FROM users WHERE id_user_credentials = %s"
+                    sql = "SELECT id_user FROM users WHERE id_user = %s"
                     cursor.execute(sql, (user_credentials_id,))
                     result = cursor.fetchone()
                     if result:
@@ -181,8 +179,8 @@ class UserCRUD:
                 cursor.execute("""
                     SELECT u.id_user, iu.user_name, iu.user_last_name, iu.age, uc.email, uc.rol 
                     FROM users u
-                    JOIN info_user iu ON u.id_info_user = iu.id_info_user
-                    JOIN user_credentials uc ON u.id_user_credentials = uc.id_user_credentials
+                    JOIN info_user iu ON u.id_user = iu.id_info_user
+                    JOIN user_credentials uc ON u.id_user = uc.id_user_credentials
                     WHERE uc.rol = 'U'
                 """)
                 users = cursor.fetchall()
