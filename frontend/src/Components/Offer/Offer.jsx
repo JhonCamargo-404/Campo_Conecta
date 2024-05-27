@@ -20,13 +20,12 @@ const Offer = () => {
     salary: 0,
     feeding: '',
     workingHours: 0,
-    workingDay: '',
+    workingDay: '', // Correctly initialize workingDay
     images: []
   });
   const [alertInfo, setAlertInfo] = useState({ visible: false, color: '', title: '', description: '' });
 
   useEffect(() => {
-    // Suponiendo que el usuario selecciona el primer municipio por defecto
     if (municipiosData.length > 0) {
       const { Municipio, Latitud, Longitud } = municipiosData[0];
       setFormData(prev => ({
@@ -111,7 +110,8 @@ const Offer = () => {
           <form onSubmit={handleSubmit}>
             <h1>Formulario de Creación de Ofertas</h1>
             <div style={{ position: 'fixed', top: 10, right: 10, zIndex: 1000 }}>
-              {alertInfo.visible && <AlertComponent color={alertInfo.color} title={alertInfo.title} description={alertInfo.description} />}            </div>
+              {alertInfo.visible && <AlertComponent color={alertInfo.color} title={alertInfo.title} description={alertInfo.description} />}            
+            </div>
             <div className="input-box-image">
               <UploadComponent onFilesSelected={(files) => setFormData(prev => ({ ...prev, images: files }))} />
             </div>
@@ -179,9 +179,9 @@ const Offer = () => {
 
               <SelectField
                 label="Jornada"
-                name="shift"
+                name="workingDay" // Ensure the name matches the state property
                 options={["Completa", "Media"]}
-                value={formData.workingDay === 'D' ? 'Completa' : 'Media'}
+                value={formData.workingDay}
                 onChange={handleChange}
               />
 
@@ -192,7 +192,6 @@ const Offer = () => {
                 value={formData.description}
                 onChange={handleChange}
               />
-
             </div>
             <div className="button-container">
               <button type="submit" className="create-offer-button">Crear oferta</button>
