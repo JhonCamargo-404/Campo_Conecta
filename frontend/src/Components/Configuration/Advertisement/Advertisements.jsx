@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import Applicants from './Applicants';
+import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';  
 
 const Advertisements = () => {
   const [postulaciones, setPostulaciones] = useState([]);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
   const token = sessionStorage.getItem('token');
   const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
-  const navigate = useNavigate(); // Crear instancia de useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPostulaciones = async () => {
@@ -19,7 +21,9 @@ const Advertisements = () => {
       }
     };
 
-    fetchPostulaciones();
+    if (userId) {
+      fetchPostulaciones();
+    }
   }, [userId]);
 
   const handleDelete = async (id) => {
@@ -34,6 +38,14 @@ const Advertisements = () => {
     }
   };
 
+  const openModal = (offerId) => {
+    setSelectedOfferId(offerId);
+  };
+
+  const closeModal = () => {
+    setSelectedOfferId(null);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-white big-container relative">
       <div className="w-full max-w-4xl px-4">
@@ -42,11 +54,12 @@ const Advertisements = () => {
           <div 
             key={index} 
             className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer"
+            onClick={() => openModal(postulacion.id_offer)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                {postulacion.image_url ? (
-                  <img src={postulacion.image_url} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
+                {postulacion.image_urls && postulacion.image_urls.length > 0 ? (
+                  <img src={postulacion.image_urls[0]} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
                 ) : (
                   <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
                 )}
@@ -57,7 +70,7 @@ const Advertisements = () => {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/EditOffer/${postulacion.id_offer}`); // Redirigir a la ruta de edición
+                  navigate(`/EditOffer/${postulacion.id_offer}`);
                 }} 
                 className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
                 Editar
@@ -79,6 +92,9 @@ const Advertisements = () => {
           </button>
         </div>
       </div>
+      {selectedOfferId && (
+        <Applicants offerId={selectedOfferId} closeModal={closeModal} />
+      )}
     </div>
   );
 };

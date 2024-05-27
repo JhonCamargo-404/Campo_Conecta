@@ -250,11 +250,11 @@ async def get_offer(offer_id: int):
 
 @app.put("/updateOffer/{offer_id}")
 async def update_offer(
-    offer_id: int,
-    labor_details: LaborDetails,
-    offer_details: OfferDetails,
-    new_images: List[UploadFile] = File(None),
-    deleted_images: List[str] = []
+        offer_id: int,
+        labor_details: LaborDetails,
+        offer_details: OfferDetails,
+        new_images: List[UploadFile] = File(None),
+        deleted_images: List[str] = []
 ):
     new_image_paths = []
     for image in new_images:
@@ -506,5 +506,14 @@ async def update_profile(user_id: int, request: ProfileUpdateRequest):
     result = user_crud.update_user_info(user_id, request.firstName, request.lastName, request.age, request.email)
     if result["success"]:
         return {"success": True, "message": "Perfil actualizado con éxito"}
+    else:
+        raise HTTPException(status_code=400, detail=result["message"])
+
+
+@app.delete("/delete_application/{id_applicant}/{id_offer}")
+async def delete_application(id_applicant: int, id_offer: int):
+    result = offer_crud.delete_application(id_applicant, id_offer)
+    if result["success"]:
+        return result
     else:
         raise HTTPException(status_code=400, detail=result["message"])

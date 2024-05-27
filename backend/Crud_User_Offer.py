@@ -72,20 +72,21 @@ class CrudUserOffer:
         try:
             with self.connection.cursor() as cursor:
                 sql = """
-                        SELECT 
-                            o.id_offer, 
-                            oa.estado, 
-                            oi.name_offer, 
-                            oi.description,
-                            MIN(io.image_path) AS image_path  
-                        FROM offer_applicant oa
-                        JOIN offer o ON oa.id_offer = o.id_offer
-                        JOIN offer_info oi ON o.id_offer = oi.id_offer_info
-                        LEFT JOIN image_offer io ON oi.id_offer_info = io.id_offer_info  
-                        WHERE oa.id_applicant IN (
-                            SELECT id_applicant FROM applicant WHERE id_user=%s
-                        )
-                        GROUP BY o.id_offer, oa.estado, oi.name_offer, oi.description 
+                SELECT 
+                    o.id_offer, 
+                    oa.id_applicant,
+                    oa.estado, 
+                    oi.name_offer, 
+                    oi.description,
+                    MIN(io.image_path) AS image_path  
+                FROM offer_applicant oa
+                JOIN offer o ON oa.id_offer = o.id_offer
+                JOIN offer_info oi ON o.id_offer = oi.id_offer_info
+                LEFT JOIN image_offer io ON oi.id_offer_info = io.id_offer_info  
+                WHERE oa.id_applicant IN (
+                    SELECT id_applicant FROM applicant WHERE id_user=%s
+                )
+                GROUP BY o.id_offer, oa.id_applicant, oa.estado, oi.name_offer, oi.description 
                 """
                 cursor.execute(sql, (id_user,))
                 results = cursor.fetchall()

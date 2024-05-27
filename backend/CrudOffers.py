@@ -123,19 +123,19 @@ class OfferCRUD:
         with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
             sql = """
             SELECT
-                o.id_offer, 
-                oi.name_offer, 
-                oi.start_day, 
-                oi.description, 
+                o.id_offer,
+                oi.name_offer,
+                oi.start_day,
+                oi.description,
                 oi.coordinates,
                 hu.id_host_user,
-                MIN(im.image_path) AS image_path  # Selecciona la primera imagen encontrada
+                GROUP_CONCAT(im.image_path) AS image_paths
             FROM offer o
             JOIN offer_info oi ON o.id_offer = oi.id_offer_info
             JOIN host_user hu ON o.id_host_user = hu.id_host_user
             LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
             WHERE hu.id_user = %s
-            GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
+            GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user
             """
             cursor.execute(sql, (id_user,))
             results = cursor.fetchall()
@@ -144,11 +144,11 @@ class OfferCRUD:
             for offer in results:
                 if offer['start_day'] and isinstance(offer['start_day'], datetime.date):
                     offer['start_day'] = offer['start_day'].strftime('%Y-%m-%d')
-                if offer['image_path']:
-                    cleaned_path = offer['image_path'].replace('../backend/offer_images/', '')
-                    offer['image_url'] = f"http://localhost:8000/{cleaned_path}"
+                if offer['image_paths']:
+                    image_urls = [f"http://localhost:8000/{path}" for path in offer['image_paths'].split(',')]
+                    offer['image_urls'] = image_urls
                 else:
-                    offer['image_url'] = None
+                    offer['image_urls'] = []
 
             return results
 
@@ -397,6 +397,20 @@ class OfferCRUD:
             return {"success": False, "message": str(e)}
         finally:
             self.connection.close()
+
+    def delete_application(self, id_applicant, id_offer):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = """
+                DELETE FROM offer_applicant
+                WHERE id_applicant = %s AND id_offer = %s
+                """
+                cursor.execute(sql, (id_applicant, id_offer))
+                self.connection.commit()
+                return {"success": True, "message": "Application deleted successfully"}
+        except Exception as e:
+            self.connection.rollback()
+            return {"success": False, "message": str(e)}
 
     def __del__(self):
         self.connection.close()

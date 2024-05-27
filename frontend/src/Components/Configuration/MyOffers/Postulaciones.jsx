@@ -11,9 +11,22 @@ const Postulaciones = () => {
     axios.get(`http://127.0.0.1:8000/get_applications/${userId}`)
       .then(response => {
         setPostulaciones(response.data);
+        console.log(response.data);
       })
       .catch(error => console.error('Error fetching applications:', error));
-  }, []);
+  }, [userId]);
+
+  const handleDelete = async (id_applicant, id_offer) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta postulación?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(`http://127.0.0.1:8000/delete_application/${id_applicant}/${id_offer}`);
+        setPostulaciones(postulaciones.filter(postulacion => postulacion.id_applicant !== id_applicant || postulacion.id_offer !== id_offer));
+      } catch (error) {
+        console.error("Error deleting application:", error);
+      }
+    }
+  };
 
   const colorClases = (estado) => {
     switch (estado) {
@@ -48,10 +61,10 @@ const Postulaciones = () => {
               </span>
             </div>
             <div className="flex justify-end mt-4 space-x-3">
-              <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
-                Editar
-              </button>
-              <button className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
+              <button
+                onClick={() => handleDelete(postulacion.id_applicant, postulacion.id_offer)}
+                className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium"
+              >
                 Eliminar
               </button>
             </div>
