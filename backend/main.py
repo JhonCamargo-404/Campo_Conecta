@@ -248,6 +248,34 @@ async def get_offer(offer_id: int):
         raise HTTPException(status_code=404, detail="Offer not found")
 
 
+@app.put("/updateOffer/{offer_id}")
+async def update_offer(
+    offer_id: int,
+    labor_details: LaborDetails,
+    offer_details: OfferDetails,
+    new_images: List[UploadFile] = File(None),
+    deleted_images: List[str] = []
+):
+    new_image_paths = []
+    for image in new_images:
+        path = f"../backend/offer_images/{image.filename}"
+        with open(path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+        new_image_paths.append(path)
+
+    result = offer_crud.update_offer(
+        offer_id,
+        labor_details.dict(),
+        offer_details.dict(),
+        new_image_paths,
+        deleted_images
+    )
+    if result["success"]:
+        return {"success": True, "message": "Oferta actualizada con éxito"}
+    else:
+        raise HTTPException(status_code=400, detail=result["message"])
+
+
 @app.post("/submit-dates")
 async def submit_dates(date_range: DateRange):
     id_applicant = offer_crud.add_applicant(date_range.id_user, date_range.startDate, date_range.endDate)

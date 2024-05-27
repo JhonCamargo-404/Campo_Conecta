@@ -347,5 +347,56 @@ class OfferCRUD:
             print(f"An error occurred: {e}")
             return []
 
+    def update_offer(self, offer_id, labor_details, offer_details, new_images, deleted_images):
+        try:
+            with self.connection.cursor() as cursor:
+                # Actualizar labor_conditions
+                sql = """
+                UPDATE labor_conditions 
+                SET salary = %s, feeding = %s, workingHours = %s, workingDay = %s 
+                WHERE id_labor_conditions = %s
+                """
+                cursor.execute(sql, (
+                    labor_details['salary'],
+                    labor_details['feeding'],
+                    labor_details['workingHours'],
+                    labor_details['workingDay'],
+                    offer_id
+                ))
+
+                # Actualizar offer_info
+                sql = """
+                UPDATE offer_info 
+                SET name_offer = %s, start_day = %s, description = %s, municipality = %s, coordinates = %s 
+                WHERE id_offer_info = %s
+                """
+                cursor.execute(sql, (
+                    offer_details['name_offer'],
+                    offer_details['start_day'],
+                    offer_details['description'],
+                    offer_details['municipality'],
+                    offer_details['coordinates'],
+                    offer_id
+                ))
+
+                # Eliminar imágenes marcadas para eliminación
+                if deleted_images:
+                    sql = "DELETE FROM image_offer WHERE image_path IN (%s)" % ','.join(['%s'] * len(deleted_images))
+                    cursor.execute(sql, tuple(deleted_images))
+
+                # Insertar nuevas imágenes
+                if new_images:
+                    sql = "INSERT INTO image_offer (id_offer_info, image_path) VALUES (%s, %s)"
+                    cursor.executemany(sql, [(offer_id, image) for image in new_images])
+
+                self.connection.commit()
+                return {"success": True, "message": "Oferta actualizada con éxito"}
+        except Exception as e:
+            self.connection.rollback()
+            print(f"Error updating offer: {e}")
+            return {"success": False, "message": str(e)}
+        finally:
+            self.connection.close()
+
     def __del__(self):
         self.connection.close()
