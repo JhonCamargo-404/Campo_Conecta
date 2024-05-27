@@ -1,0 +1,617 @@
+[
+    {
+        "Municipio": "TUNJA",
+        "Latitud": 5.518472615,
+        "Longitud": -73.378018556
+    },
+    {
+        "Municipio": "ALMEIDA",
+        "Latitud": 4.954825081,
+        "Longitud": -73.388134245
+    },
+    {
+        "Municipio": "AQUITANIA",
+        "Latitud": 5.437416373,
+        "Longitud": -72.871494711
+    },
+    {
+        "Municipio": "ARCABUCO",
+        "Latitud": 5.73526424,
+        "Longitud": -73.427931091
+    },
+    {
+        "Municipio": "BELÉN",
+        "Latitud": 6.005059265,
+        "Longitud": -72.893698873
+    },
+    {
+        "Municipio": "BERBEO",
+        "Latitud": 5.230936356,
+        "Longitud": -73.127319437
+    },
+    {
+        "Municipio": "BETEITIVA",
+        "Latitud": 5.920858933,
+        "Longitud": -72.848578763
+    },
+    {
+        "Municipio": "BOAVITA",
+        "Latitud": 6.337515626,
+        "Longitud": -72.62021239
+    },
+    {
+        "Municipio": "BOYACÁ",
+        "Latitud": 5.439856216,
+        "Longitud": -73.381369938
+    },
+    {
+        "Municipio": "BRICEÑO",
+        "Latitud": 5.673229265,
+        "Longitud": -73.926607047
+    },
+    {
+        "Municipio": "BUENAVISTA",
+        "Latitud": 5.489399419,
+        "Longitud": -73.950662546
+    },
+    {
+        "Municipio": "BUSBANZÁ",
+        "Latitud": 5.843483731,
+        "Longitud": -72.87574623
+    },
+    {
+        "Municipio": "CALDAS",
+        "Latitud": 5.575990669,
+        "Longitud": -73.880575077
+    },
+    {
+        "Municipio": "CAMPOHERMOSO",
+        "Latitud": 5.006862536,
+        "Longitud": -73.144670302
+    },
+    {
+        "Municipio": "CERINZA",
+        "Latitud": 5.962013698,
+        "Longitud": -72.964472884
+    },
+    {
+        "Municipio": "CHINAVITA",
+        "Latitud": 5.202971639,
+        "Longitud": -73.340480736
+    },
+    {
+        "Municipio": "CHIQUINQUIRÁ",
+        "Latitud": 5.622488024,
+        "Longitud": -73.804245312
+    },
+    {
+        "Municipio": "CHISCAS",
+        "Latitud": 6.68911806,
+        "Longitud": -72.417956748
+    },
+    {
+        "Municipio": "CHITA",
+        "Latitud": 6.091468485,
+        "Longitud": -72.439031738
+    },
+    {
+        "Municipio": "CHITARAQUE",
+        "Latitud": 5.984394625,
+        "Longitud": -73.425823751
+    },
+    {
+        "Municipio": "CHIVATÁ",
+        "Latitud": 5.556830465,
+        "Longitud": -73.260617153
+    },
+    {
+        "Municipio": "CIÉNEGA",
+        "Latitud": 5.393059633,
+        "Longitud": -73.282057716
+    },
+    {
+        "Municipio": "CÓMBITA",
+        "Latitud": 5.667822366,
+        "Longitud": -73.321370491
+    },
+    {
+        "Municipio": "COPER",
+        "Latitud": 5.452461072,
+        "Longitud": -74.059965781
+    },
+    {
+        "Municipio": "CORRALES",
+        "Latitud": 5.82454582,
+        "Longitud": -72.845448448
+    },
+    {
+        "Municipio": "COVARACHÍA",
+        "Latitud": 6.519521476,
+        "Longitud": -72.740204209
+    },
+    {
+        "Municipio": "CUBARÁ",
+        "Latitud": 6.886954878,
+        "Longitud": -72.181562849
+    },
+    {
+        "Municipio": "CUCAITA",
+        "Latitud": 5.527104109,
+        "Longitud": -73.445986459
+    },
+    {
+        "Municipio": "CUITIVA",
+        "Latitud": 5.58775449,
+        "Longitud": -72.939536863
+    },
+    {
+        "Municipio": "CHÍQUIZA",
+        "Latitud": 5.643075648,
+        "Longitud": -73.445623907
+    },
+    {
+        "Municipio": "CHIVOR",
+        "Latitud": 4.871181606,
+        "Longitud": -73.361423792
+    },
+    {
+        "Municipio": "DUITAMA",
+        "Latitud": 5.890602515,
+        "Longitud": -73.067094843
+    },
+    {
+        "Municipio": "EL COCUY",
+        "Latitud": 6.353363177,
+        "Longitud": -72.419237519
+    },
+    {
+        "Municipio": "EL ESPINO",
+        "Latitud": 6.508240556,
+        "Longitud": -72.480496247
+    },
+    {
+        "Municipio": "FIRAVITOBA",
+        "Latitud": 5.67367659,
+        "Longitud": -73.019833516
+    },
+    {
+        "Municipio": "FLORESTA",
+        "Latitud": 5.85899211,
+        "Longitud": -72.924998265
+    },
+    {
+        "Municipio": "GACHANTIVÁ",
+        "Latitud": 5.744105975,
+        "Longitud": -73.542655196
+    },
+    {
+        "Municipio": "GÁMEZA",
+        "Latitud": 5.799050256,
+        "Longitud": -72.729647651
+    },
+    {
+        "Municipio": "GARAGOA",
+        "Latitud": 5.089466651,
+        "Longitud": -73.314302722
+    },
+    {
+        "Municipio": "GUACAMAYAS",
+        "Latitud": 6.445438546,
+        "Longitud": -72.516353323
+    },
+    {
+        "Municipio": "GUATEQUE",
+        "Latitud": 5.01450831,
+        "Longitud": -73.488123516
+    },
+    {
+        "Municipio": "GUAYATÁ",
+        "Latitud": 4.931424341,
+        "Longitud": -73.496633724
+    },
+    {
+        "Municipio": "GÜICÁN DE LA SIERRA",
+        "Latitud": 6.566991765,
+        "Longitud": -72.255993335
+    },
+    {
+        "Municipio": "IZA",
+        "Latitud": 5.617366016,
+        "Longitud": -72.969865044
+    },
+    {
+        "Municipio": "JENESANO",
+        "Latitud": 5.38916272,
+        "Longitud": -73.400870207
+    },
+    {
+        "Municipio": "JERICÓ",
+        "Latitud": 6.155633662,
+        "Longitud": -72.585230926
+    },
+    {
+        "Municipio": "LABRANZAGRANDE",
+        "Latitud": 5.541378132,
+        "Longitud": -72.590384601
+    },
+    {
+        "Municipio": "LA CAPILLA",
+        "Latitud": 5.113167102,
+        "Longitud": -73.459237077
+    },
+    {
+        "Municipio": "LA VICTORIA",
+        "Latitud": 5.507008121,
+        "Longitud": -74.241627269
+    },
+    {
+        "Municipio": "LA UVITA",
+        "Latitud": 6.265126191,
+        "Longitud": -72.555510848
+    },
+    {
+        "Municipio": "VILLA DE LEYVA",
+        "Latitud": 5.665762424,
+        "Longitud": -73.514948003
+    },
+    {
+        "Municipio": "MACANAL",
+        "Latitud": 4.980176495,
+        "Longitud": -73.294136946
+    },
+    {
+        "Municipio": "MARIPÍ",
+        "Latitud": 5.569810633,
+        "Longitud": -74.020031272
+    },
+    {
+        "Municipio": "MIRAFLORES",
+        "Latitud": 5.150953297,
+        "Longitud": -73.178967217
+    },
+    {
+        "Municipio": "MONGUA",
+        "Latitud": 5.710937981,
+        "Longitud": -72.634028752
+    },
+    {
+        "Municipio": "MONGUÍ",
+        "Latitud": 5.697352228,
+        "Longitud": -72.832986642
+    },
+    {
+        "Municipio": "MONIQUIRÁ",
+        "Latitud": 5.863370485,
+        "Longitud": -73.558525378
+    },
+    {
+        "Municipio": "MOTAVITA",
+        "Latitud": 5.606192449,
+        "Longitud": -73.377342665
+    },
+    {
+        "Municipio": "MUZO",
+        "Latitud": 5.539429272,
+        "Longitud": -74.111771391
+    },
+    {
+        "Municipio": "NOBSA",
+        "Latitud": 5.778759851,
+        "Longitud": -72.932683237
+    },
+    {
+        "Municipio": "NUEVO COLÓN",
+        "Latitud": 5.354701485,
+        "Longitud": -73.448734241
+    },
+    {
+        "Municipio": "OICATÁ",
+        "Latitud": 5.610787844,
+        "Longitud": -73.279919053
+    },
+    {
+        "Municipio": "OTANCHE",
+        "Latitud": 5.753787787,
+        "Longitud": -74.197194226
+    },
+    {
+        "Municipio": "PACHAVITA",
+        "Latitud": 5.148323877,
+        "Longitud": -73.399512192
+    },
+    {
+        "Municipio": "PÁEZ",
+        "Latitud": 5.095211035,
+        "Longitud": -73.004358626
+    },
+    {
+        "Municipio": "PAIPA",
+        "Latitud": 5.762027786,
+        "Longitud": -73.137774423
+    },
+    {
+        "Municipio": "PAJARITO",
+        "Latitud": 5.382328949,
+        "Longitud": -72.696726742
+    },
+    {
+        "Municipio": "PANQUEBA",
+        "Latitud": 6.443299758,
+        "Longitud": -72.461824312
+    },
+    {
+        "Municipio": "PAUNA",
+        "Latitud": 5.688801559,
+        "Longitud": -74.005041215
+    },
+    {
+        "Municipio": "PAYA",
+        "Latitud": 5.621242742,
+        "Longitud": -72.369290598
+    },
+    {
+        "Municipio": "PAZ DE RIO",
+        "Latitud": 6.030008561,
+        "Longitud": -72.759880177
+    },
+    {
+        "Municipio": "PESCA",
+        "Latitud": 5.498483324,
+        "Longitud": -73.07837993
+    },
+    {
+        "Municipio": "PISBA",
+        "Latitud": 5.768131812,
+        "Longitud": -72.439932321
+    },
+    {
+        "Municipio": "PUERTO BOYACÁ",
+        "Latitud": 5.953466654,
+        "Longitud": -74.452858102
+    },
+    {
+        "Municipio": "QUÍPAMA",
+        "Latitud": 5.595729831,
+        "Longitud": -74.268570671
+    },
+    {
+        "Municipio": "RAMIRIQUÍ",
+        "Latitud": 5.319934092,
+        "Longitud": -73.310778996
+    },
+    {
+        "Municipio": "RÁQUIRA",
+        "Latitud": 5.496268621,
+        "Longitud": -73.628944376
+    },
+    {
+        "Municipio": "RONDÓN",
+        "Latitud": 5.379947879,
+        "Longitud": -73.196509947
+    },
+    {
+        "Municipio": "SABOYÁ",
+        "Latitud": 5.699926051,
+        "Longitud": -73.747994656
+    },
+    {
+        "Municipio": "SÁCHICA",
+        "Latitud": 5.573464882,
+        "Longitud": -73.543102003
+    },
+    {
+        "Municipio": "SAMACÁ",
+        "Latitud": 5.47053997,
+        "Longitud": -73.521175604
+    },
+    {
+        "Municipio": "SAN EDUARDO",
+        "Latitud": 5.234614686,
+        "Longitud": -73.049140669
+    },
+    {
+        "Municipio": "SAN JOSÉ DE PARE",
+        "Latitud": 5.994154088,
+        "Longitud": -73.543865224
+    },
+    {
+        "Municipio": "SAN LUIS DE GACENO",
+        "Latitud": 4.798203543,
+        "Longitud": -73.133970184
+    },
+    {
+        "Municipio": "SAN MATEO",
+        "Latitud": 6.395388812,
+        "Longitud": -72.551848623
+    },
+    {
+        "Municipio": "SAN MIGUEL DE SEMA",
+        "Latitud": 5.532326922,
+        "Longitud": -73.747158978
+    },
+    {
+        "Municipio": "SAN PABLO DE BORBUR",
+        "Latitud": 5.677345066,
+        "Longitud": -74.114037486
+    },
+    {
+        "Municipio": "SANTANA",
+        "Latitud": 6.057614971,
+        "Longitud": -73.489748282
+    },
+    {
+        "Municipio": "SANTA MARÍA",
+        "Latitud": 4.823002556,
+        "Longitud": -73.253775062
+    },
+    {
+        "Municipio": "SANTA ROSA DE VITERBO",
+        "Latitud": 5.892950301,
+        "Longitud": -72.991727804
+    },
+    {
+        "Municipio": "SANTA SOFÍA",
+        "Latitud": 5.731602716,
+        "Longitud": -73.603662869
+    },
+    {
+        "Municipio": "SATIVANORTE",
+        "Latitud": 6.13211793,
+        "Longitud": -72.730324154
+    },
+    {
+        "Municipio": "SATIVASUR",
+        "Latitud": 6.083405978,
+        "Longitud": -72.724108145
+    },
+    {
+        "Municipio": "SIACHOQUE",
+        "Latitud": 5.498747701,
+        "Longitud": -73.216817778
+    },
+    {
+        "Municipio": "SOATÁ",
+        "Latitud": 6.323088045,
+        "Longitud": -72.696040893
+    },
+    {
+        "Municipio": "SOCOTÁ",
+        "Latitud": 5.906513772,
+        "Longitud": -72.536463605
+    },
+    {
+        "Municipio": "SOCHA",
+        "Latitud": 5.960498836,
+        "Longitud": -72.682397841
+    },
+    {
+        "Municipio": "SOGAMOSO",
+        "Latitud": 5.646672053,
+        "Longitud": -72.870956503
+    },
+    {
+        "Municipio": "SOMONDOCO",
+        "Latitud": 4.970974064,
+        "Longitud": -73.428787852
+    },
+    {
+        "Municipio": "SORA",
+        "Latitud": 5.580573191,
+        "Longitud": -73.443718375
+    },
+    {
+        "Municipio": "SOTAQUIRÁ",
+        "Latitud": 5.763010553,
+        "Longitud": -73.24352232
+    },
+    {
+        "Municipio": "SORACÁ",
+        "Latitud": 5.494890461,
+        "Longitud": -73.318999965
+    },
+    {
+        "Municipio": "SUSACÓN",
+        "Latitud": 6.215200578,
+        "Longitud": -72.715756341
+    },
+    {
+        "Municipio": "SUTAMARCHÁN",
+        "Latitud": 5.640030759,
+        "Longitud": -73.625987727
+    },
+    {
+        "Municipio": "SUTATENZA",
+        "Latitud": 5.030711335,
+        "Longitud": -73.412244005
+    },
+    {
+        "Municipio": "TASCO",
+        "Latitud": 5.882294313,
+        "Longitud": -72.726268173
+    },
+    {
+        "Municipio": "TENZA",
+        "Latitud": 5.071413139,
+        "Longitud": -73.424796988
+    },
+    {
+        "Municipio": "TIBANÁ",
+        "Latitud": 5.301116649,
+        "Longitud": -73.393252095
+    },
+    {
+        "Municipio": "TIBASOSA",
+        "Latitud": 5.747329389,
+        "Longitud": -73.011147244
+    },
+    {
+        "Municipio": "TINJACÁ",
+        "Latitud": 5.577566497,
+        "Longitud": -73.676145721
+    },
+    {
+        "Municipio": "TIPACOQUE",
+        "Latitud": 6.42035349,
+        "Longitud": -72.694635834
+    },
+    {
+        "Municipio": "TOCA",
+        "Latitud": 5.580254287,
+        "Longitud": -73.160696902
+    },
+    {
+        "Municipio": "TOGÜÍ",
+        "Latitud": 5.921830062,
+        "Longitud": -73.489218055
+    },
+    {
+        "Municipio": "TÓPAGA",
+        "Latitud": 5.765350303,
+        "Longitud": -72.836729576
+    },
+    {
+        "Municipio": "TOTA",
+        "Latitud": 5.501297215,
+        "Longitud": -72.996332969
+    },
+    {
+        "Municipio": "TUNUNGUÁ",
+        "Latitud": 5.720301516,
+        "Longitud": -73.943309265
+    },
+    {
+        "Municipio": "TURMEQUÉ",
+        "Latitud": 5.305697418,
+        "Longitud": -73.509087138
+    },
+    {
+        "Municipio": "TUTA",
+        "Latitud": 5.678126998,
+        "Longitud": -73.173430534
+    },
+    {
+        "Municipio": "TUTAZÁ",
+        "Latitud": 6.078051903,
+        "Longitud": -72.857078319
+    },
+    {
+        "Municipio": "ÚMBITA",
+        "Latitud": 5.217241368,
+        "Longitud": -73.463384768
+    },
+    {
+        "Municipio": "VENTAQUEMADA",
+        "Latitud": 5.383385481,
+        "Longitud": -73.520979424
+    },
+    {
+        "Municipio": "VIRACACHÁ",
+        "Latitud": 5.440558216,
+        "Longitud": -73.266274556
+    },
+    {
+        "Municipio": "ZETAQUIRA",
+        "Latitud": 5.285635983,
+        "Longitud": -73.167630912
+    }
+]

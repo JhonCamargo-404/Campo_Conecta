@@ -52,21 +52,56 @@
     margin-bottom: 14vh;
 }
 
+.apply-button-container {
+    margin-top: 20px; /* Espacio entre el calendario y el botón */
+    display: flex;
+    justify-content: center; /* Centrar el botón horizontalmente */
+}
+
 .apply-button {
-    background-color: #000000;
-    color: white;
+    width: 200px; 
+    padding: 10px; 
+    background-color: #000; 
+    color: #fff; 
     border: none;
-    padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 16px;
-    text-align: center;
-    display: inline-block;
-    transition: background-color 0.3s;
+    font-size: 16px; /* Aumentar el tamaño de la fuente */
 }
 
 .apply-button:hover {
-    background-color: #333333;
+    background-color: #333;
+}
+
+.ReactModal__Content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+    width: 90%;
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    z-index: 1001; /* Asegura que el contenido está sobre el overlay */
+}
+
+.upload-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.upload-button, .close-button {
+    margin-right: 10px;
+}
+
+.view-offer-municipality {
+    margin-bottom: 10px;  /* Ajusta este valor según necesites */
+}
+
+.body-blur {
+    filter: blur(5px);
 }
 
 /* Responsive */

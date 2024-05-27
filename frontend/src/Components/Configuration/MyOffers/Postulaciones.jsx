@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const Postulaciones = () => {
-  // Suponiendo que tengas un estado o prop para tus postulaciones
-  const postulaciones = [
-    { estado: 'en revision', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    { estado: 'rechazado', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    { estado: 'aceptado', texto: 'Proin id justo ac dui blandit sollicitudin.' },
-    // ... otros estados
-  ];
+  const [postulaciones, setPostulaciones] = useState([]);
+  const token = sessionStorage.getItem('token');
+  const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
 
-  // Función para determinar los colores basados en el estado
+  useEffect(() => {
+    axios.get(`http://127.0.0.1:8000/get_applications/${userId}`)
+      .then(response => {
+        setPostulaciones(response.data);
+        console.log(response.data);
+      })
+      .catch(error => console.error('Error fetching applications:', error));
+  }, [userId]);
+
+  const handleDelete = async (id_applicant, id_offer) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta postulación?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(`http://127.0.0.1:8000/delete_application/${id_applicant}/${id_offer}`);
+        setPostulaciones(postulaciones.filter(postulacion => postulacion.id_applicant !== id_applicant || postulacion.id_offer !== id_offer));
+      } catch (error) {
+        console.error("Error deleting application:", error);
+      }
+    }
+  };
+
   const colorClases = (estado) => {
-    switch(estado) {
+    switch (estado) {
       case 'en revision':
         return 'text-yellow-500 bg-yellow-100';
       case 'rechazado':
@@ -31,18 +49,22 @@ const Postulaciones = () => {
           <div key={index} className="bg-white p-6 rounded-lg shadow-md mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
-                <div className="text-gray-700">{postulacion.texto}</div>
+                {postulacion.image_url ? (
+                  <img src={postulacion.image_url} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
+                ) : (
+                  <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                )}
+                <div className="text-gray-700">{postulacion.name_offer}</div>
               </div>
               <span className={`px-4 py-1 rounded-full text-sm font-semibold uppercase ${colorClases(postulacion.estado)}`}>
                 {postulacion.estado}
               </span>
             </div>
             <div className="flex justify-end mt-4 space-x-3">
-              <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
-                Editar
-              </button>
-              <button className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
+              <button
+                onClick={() => handleDelete(postulacion.id_applicant, postulacion.id_offer)}
+                className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium"
+              >
                 Eliminar
               </button>
             </div>

@@ -15,15 +15,15 @@ const ConfirmOffer = () => {
               <div className="confirmation-message">
                 <h1>
                   El host estará en contacto en el caso de seleccionarlo.
-                  <p className="paragraph-1">¡Gracias por apoyar el campo colombiano!</p> 
+                  <p className="paragraph-1">¡Gracias por apoyar el campo colombiano!</p>
                   <p className="paragraph-2">Recuerda postularte a mas ofertas para tener mayor posibilidad de ser seleccionado</p>
                 </h1>
               </div>
             </div>
             <div className="return-home-button">
-            <button className="return-home" type="submit">
-              <Link to="../Home">Volver al inicio</Link>
-            </button>
+              <button className="return-home" type="submit">
+                <Link to="/Home">Volver al inicio</Link>
+              </button>
             </div>
           </from>
         </div>

@@ -1,39 +1,86 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import Applicants from './Applicants';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';  
 
 const Advertisements = () => {
   const [postulaciones, setPostulaciones] = useState([]);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const token = sessionStorage.getItem('token');
+  const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPostulaciones = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/get_offers");
-        const data = await response.json();
-        setPostulaciones(data);
+        const response = await axios.get(`http://127.0.0.1:8000/get_user_offer/${userId}`);
+        setPostulaciones(response.data);
       } catch (error) {
         console.error("Error fetching postulaciones:", error);
       }
     };
 
-    fetchPostulaciones();
-  }, []);
+    if (userId) {
+      fetchPostulaciones();
+    }
+  }, [userId]);
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar esta oferta?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(`http://127.0.0.1:8000/delete_offer/${id}`);
+        setPostulaciones(postulaciones.filter(postulacion => postulacion.id_offer !== id));
+      } catch (error) {
+        console.error("Error deleting offer:", error);
+      }
+    }
+  };
+
+  const openModal = (offerId) => {
+    setSelectedOfferId(offerId);
+  };
+
+  const closeModal = () => {
+    setSelectedOfferId(null);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center py-10 bg-white big-container">
+    <div className="flex flex-col items-center justify-center py-10 bg-white big-container relative">
       <div className="w-full max-w-4xl px-4">
         <h1 className="text-4xl font-bold text-gray-700 mb-8 text-center">Mis anuncios</h1>
         {postulaciones.map((postulacion, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow-md mb-6">
+          <div 
+            key={index} 
+            className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer"
+            onClick={() => openModal(postulacion.id_offer)}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                {postulacion.image_urls && postulacion.image_urls.length > 0 ? (
+                  <img src={postulacion.image_urls[0]} alt="Offer" className="flex-shrink-0 h-12 w-12 rounded-full mr-4 object-cover" />
+                ) : (
+                  <div className="flex-shrink-0 h-12 w-12 bg-gray-200 rounded-full mr-4"></div>
+                )}
                 <div className="text-gray-700">{postulacion.name_offer}</div>
               </div>
             </div>
             <div className="flex justify-end mt-4 space-x-3">
-              <button className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/EditOffer/${postulacion.id_offer}`);
+                }} 
+                className="px-4 py-2 text-white bg-blue-500 hover:bg-blue-600 rounded-md font-medium">
                 Editar
               </button>
-              <button className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(postulacion.id_offer);
+                }} 
+                className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-md font-medium">
                 Eliminar
               </button>
             </div>
@@ -45,6 +92,9 @@ const Advertisements = () => {
           </button>
         </div>
       </div>
+      {selectedOfferId && (
+        <Applicants offerId={selectedOfferId} closeModal={closeModal} />
+      )}
     </div>
   );
 };
