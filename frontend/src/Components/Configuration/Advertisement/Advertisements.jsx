@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Applicants from './Applicants';
 import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import { jwtDecode } from 'jwt-decode';  
 
 const Advertisements = () => {
   const [postulaciones, setPostulaciones] = useState([]);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
   const token = sessionStorage.getItem('token');
   const [userId, setUserId] = useState(token ? jwtDecode(token).id_user : null);
   const navigate = useNavigate(); // Crear instancia de useNavigate
@@ -34,6 +36,14 @@ const Advertisements = () => {
     }
   };
 
+  const openModal = (offerId) => {
+    setSelectedOfferId(offerId);
+  };
+
+  const closeModal = () => {
+    setSelectedOfferId(null);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center py-10 bg-white big-container relative">
       <div className="w-full max-w-4xl px-4">
@@ -42,6 +52,7 @@ const Advertisements = () => {
           <div 
             key={index} 
             className="bg-white p-6 rounded-lg shadow-md mb-6 cursor-pointer"
+            onClick={() => openModal(postulacion.id_offer)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -79,6 +90,9 @@ const Advertisements = () => {
           </button>
         </div>
       </div>
+      {selectedOfferId && (
+        <Applicants offerId={selectedOfferId} closeModal={closeModal} />
+      )}
     </div>
   );
 };

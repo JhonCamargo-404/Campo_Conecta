@@ -9,7 +9,7 @@ import TextareaField from './TextareaField';
 import municipiosData from '../../file/municipios_boyaca_coordenadas.json';
 import { AlertComponent } from "../Alert/AlertComponent";
 
-const Offer = () => {
+const EditOffer = () => {
   const navigate = useNavigate();
   const { offerId } = useParams();
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const Offer = () => {
           feeding: offer.feeding,
           workingHours: offer.workingHours,
           workingDay: offer.workingDay,
-          images: offer.image_paths ? offer.image_paths.split(',') : [],
+          images: offer.image_paths ? offer.image_paths.split(',').map(path => `http://localhost:8000${path}`) : [],
           deletedImages: []
         });
       } catch (error) {
@@ -85,6 +85,13 @@ const Offer = () => {
     }));
   };
 
+  const handleFilesSelected = (files) => {
+    setFormData(prevState => ({
+      ...prevState,
+      images: [...prevState.images, ...files]
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -111,15 +118,13 @@ const Offer = () => {
       coordinates: formData.coordinates
     }));
 
-    if (formData.images && formData.images.length > 0) {
-      formData.images.forEach((image, i) => {
-        if (typeof image === 'object') {
-          data.append(`new_images`, image);
-        }
-      });
-    }
+    formData.images.forEach((image, i) => {
+      if (typeof image === 'object') {
+        data.append(`new_images`, image);
+      }
+    });
 
-    if (formData.deletedImages && formData.deletedImages.length > 0) {
+    if (formData.deletedImages.length > 0) {
       data.append('deleted_images', JSON.stringify(formData.deletedImages));
     }
 
@@ -151,15 +156,11 @@ const Offer = () => {
               </div>
             )}
             <div className="input-box-image">
-              <UploadComponent onFilesSelected={(files) => setFormData(prev => ({ ...prev, images: [...prev.images, ...files] }))} />
-              <div className="existing-images">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="image-preview">
-                    <img src={typeof image === 'string' ? image : URL.createObjectURL(image)} alt={`Imagen ${index + 1}`} />
-                    <button type="button" onClick={() => handleImageRemove(image)}>Eliminar</button>
-                  </div>
-                ))}
-              </div>
+              <UploadComponent 
+                initialImages={formData.images}
+                onFilesSelected={handleFilesSelected}
+                onImageRemove={handleImageRemove}
+              />
             </div>
 
             <div className="todo">
@@ -242,6 +243,7 @@ const Offer = () => {
             </div>
             <div className="button-container">
               <button type="submit" className="create-offer-button">Actualizar oferta</button>
+              <button type="button" onClick={() => navigate(-1)} className="cancel-button">Cancelar</button>
             </div>
           </form>
         </div>
@@ -250,4 +252,4 @@ const Offer = () => {
   );
 };
 
-export default Offer;
+export default EditOffer;

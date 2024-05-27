@@ -123,19 +123,19 @@ class OfferCRUD:
         with self.connection.cursor(pymysql.cursors.DictCursor) as cursor:
             sql = """
             SELECT
-                o.id_offer, 
-                oi.name_offer, 
-                oi.start_day, 
-                oi.description, 
+                o.id_offer,
+                oi.name_offer,
+                oi.start_day,
+                oi.description,
                 oi.coordinates,
                 hu.id_host_user,
-                MIN(im.image_path) AS image_path  # Selecciona la primera imagen encontrada
+                GROUP_CONCAT(im.image_path) AS image_path
             FROM offer o
             JOIN offer_info oi ON o.id_offer = oi.id_offer_info
             JOIN host_user hu ON o.id_host_user = hu.id_host_user
             LEFT JOIN image_offer im ON oi.id_offer_info = im.id_offer_info
             WHERE hu.id_user = %s
-            GROUP BY o.id_offer  # Agrupa por oferta para evitar duplicados
+            GROUP BY o.id_offer, oi.name_offer, oi.start_day, oi.description, oi.coordinates, hu.id_host_user
             """
             cursor.execute(sql, (id_user,))
             results = cursor.fetchall()

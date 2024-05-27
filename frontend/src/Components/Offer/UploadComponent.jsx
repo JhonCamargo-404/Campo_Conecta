@@ -1,22 +1,34 @@
 import { Trash } from 'phosphor-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Upload } from 'keep-react';
 import folderIcon from '../../Assets/Image.svg';
 
-export const UploadComponent = ({ onFilesSelected }) => {
+export const UploadComponent = ({ initialImages = [], onFilesSelected, onImageRemove }) => {
     const [files, setFiles] = useState([]);
+    const [initialFiles, setInitialFiles] = useState(initialImages);
+
+    useEffect(() => {
+        setInitialFiles(initialImages);
+    }, [initialImages]);
 
     const onDrop = useCallback((acceptedFiles) => {
         // Filtra solo archivos de imagen
         const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'));
         setFiles(imageFiles);
-        onFilesSelected(imageFiles);  // Actualizar el estado en el componente padre
-    }, [onFilesSelected]);
+        onFilesSelected([...initialFiles, ...imageFiles]);  // Actualizar el estado en el componente padre
+    }, [initialFiles, onFilesSelected]);
 
     const handleRemoveFile = (fileName) => {
         const newFiles = files.filter(file => file.name !== fileName);
         setFiles(newFiles);
-        onFilesSelected(newFiles);  // Actualizar el estado en el componente padre
+        onFilesSelected([...initialFiles, ...newFiles]);  // Actualizar el estado en el componente padre
+    };
+
+    const handleRemoveInitialFile = (fileUrl) => {
+        const newInitialFiles = initialFiles.filter(file => file !== fileUrl);
+        setInitialFiles(newInitialFiles);
+        onImageRemove(fileUrl);
+        onFilesSelected([...newInitialFiles, ...files]);  // Actualizar el estado en el componente padre
     };
 
     return (
@@ -30,8 +42,14 @@ export const UploadComponent = ({ onFilesSelected }) => {
                     <p>Formatos permitidos (e.g., JPG, PNG), tamaño máximo 50 MB.</p>
                 </Upload.Text>
             </Upload.Body>
-            <Upload.Footer isFileExists={files.length > 0}>
+            <Upload.Footer isFileExists={files.length > 0 || initialFiles.length > 0}>
                 <ul>
+                    {initialFiles.map((fileUrl, index) => (
+                        <li key={index}>
+                            <img src={fileUrl} alt={`Imagen ${index + 1}`} style={{ width: 50, height: 50 }} />
+                            <Trash size={16} color="red" onClick={() => handleRemoveInitialFile(fileUrl)} />
+                        </li>
+                    ))}
                     {files.map((file) => (
                         <li key={file.name}>
                             {file.name}

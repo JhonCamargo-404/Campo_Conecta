@@ -59,7 +59,7 @@ function App() {
         <Route path="/DeleteUsers" element={<DeleteUsers />} />
         <Route path="/DeleteMyAdvertisement" element={<DeleteMyAdvertisement />} />
         <Route path="/HomeAdmin" element={<HomeAdmin />} />
-        <Route path="/EditOffer/:id" element={<EditOffer />} />
+        <Route path="/EditOffer/:offerId" element={<EditOffer />} />
       </Routes>
     </div>
   );
