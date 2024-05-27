@@ -116,10 +116,10 @@ const ViewOffer = () => {
                 })
                 .catch(error => {
                     console.error('Error sending dates:', error);
-                    setError('Please ensure you have selected both start and end dates.');
+                    setError('Por favor asegura de haber seleccionado fecha de inicio y fin.');
                 });
         } else {
-            setError('Please select both start and end dates.');
+            setError('Por favor selecciona fecha de inicio y de fin.');
         }
     };
 
