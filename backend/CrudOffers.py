@@ -226,13 +226,24 @@ class OfferCRUD:
     def add_applicant(self, id_user, start_date, finish_date):
         try:
             with self.connection.cursor() as cursor:
-                sql_applicant = """
-                INSERT INTO applicant (id_user, startDate, finishDate)
-                VALUES (%s, %s, %s)
+                # Verificar si el applicant ya existe
+                check_applicant_sql = """
+                SELECT id_applicant FROM applicant
+                WHERE id_user = %s
                 """
-                cursor.execute(sql_applicant, (id_user, start_date, finish_date))
-                self.connection.commit()
-                return cursor.lastrowid  # Devuelve el ID del nuevo registro insertado
+                cursor.execute(check_applicant_sql, (id_user,))
+                result = cursor.fetchone()
+                if result:
+                    return result["id_applicant"]
+                else:
+                    sql_applicant = """
+                    INSERT INTO applicant (id_user, startDate, finishDate)
+                    VALUES (%s, %s, %s)
+                    RETURNING id_applicant
+                    """
+                    cursor.execute(sql_applicant, (id_user, start_date, finish_date))
+                    self.connection.commit()
+                    return cursor.fetchone()[0]  # Devuelve el ID del nuevo registro insertado
         except Exception as e:
             print("Error occurred while adding applicant:", e)
             self.connection.rollback()
